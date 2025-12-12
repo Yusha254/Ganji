@@ -1,57 +1,108 @@
-import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
+import MaskedView from '@react-native-masked-view/masked-view';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Tabs } from 'expo-router';
+import { useColorScheme } from 'nativewind';
+import React from 'react';
+import { Text } from 'react-native';
 
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
-
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: {
+function TabBarIcon({
+  name,
+  color,
+  isActive,
+}: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
+  isActive: boolean;
 }) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+  if (isActive) {
+    return (
+      <MaskedView
+        maskElement={
+          <FontAwesome name={name} size={28} color="black" style={{ marginBottom: -3 }} />
+        }
+      >
+        <LinearGradient
+          colors={['#a855f7', '#ec4899']}
+          start={[0, 0]}
+          end={[1, 0]}
+          style={{ height: 28, width: 28 }}
+        />
+      </MaskedView>
+    );
+  }
+  return <FontAwesome name={name} size={28} color={color} style={{ marginBottom: -3 }} />;
 }
 
+function GradientHeaderTitle({ title }: { title: string }) {
+  return (
+    <MaskedView
+      maskElement={
+        <Text
+          style={{
+            fontSize: 20,
+            fontWeight: 'bold',
+            textAlign: 'center',
+            color: 'black', // must be black for masking
+          }}
+        >
+          {title}
+        </Text>
+      }
+    >
+      <LinearGradient
+        colors={['#a855f7', '#ec4899']}
+        start={[0, 0]}
+        end={[1, 0]}
+        style={{
+          height: 24, // matches text size roughly
+          width: title.length * 12, // approximate width based on characters
+        }}
+      />
+    </MaskedView>
+  );
+}
+
+
+
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: useClientOnlyValue(false, true),
-      }}>
+        headerStyle: {
+        backgroundColor: isDark ? '#020617' : '#faf5ff',
+        borderBottomColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgb(233, 213, 255)',
+        borderBottomWidth: 0.5,
+      },
+      tabBarStyle: {
+        backgroundColor: isDark ? '#020617' : '#faf5ff',
+        borderTopColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgb(233, 213, 255)',
+        borderTopWidth: 0.5,
+      },
+
+        tabBarActiveTintColor: isDark ? '#f9a8d4' : '#a855f7',
+        tabBarInactiveTintColor: isDark ? '#d1d5db' : '#374151',
+        headerTitle: ({ children }) => <GradientHeaderTitle title={String(children)} />,
+        headerTitleAlign: 'center',
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
+          title: 'Home',
+          headerTitle: () => <GradientHeaderTitle title="Home" />,
+          tabBarIcon: ({ color, focused }) => <TabBarIcon name="home" color={color} isActive={focused} />,
         }}
       />
       <Tabs.Screen
         name="two"
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Transactions',
+          headerTitle: () => <GradientHeaderTitle title="Transactions" />,
+          tabBarIcon: ({ color, focused }) => <TabBarIcon name="list-alt" color={color} isActive={focused} />,
         }}
       />
     </Tabs>

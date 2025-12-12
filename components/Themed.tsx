@@ -1,45 +1,224 @@
-/**
- * Learn more about Light and Dark modes:
- * https://docs.expo.io/guides/color-schemes/
- */
+// Themed.tsx
 
-import { Text as DefaultText, View as DefaultView } from 'react-native';
+import { LinearGradient } from "expo-linear-gradient";
+import { useColorScheme } from "nativewind";
+import { ScrollViewProps as DefaultScrollViewProps, ScrollView as RNScrollView, Text as RNText, View as RNView } from "react-native";
 
-import Colors from '@/constants/Colors';
-import { useColorScheme } from './useColorScheme';
-
-type ThemeProps = {
+export type ThemeProps = {
   lightColor?: string;
   darkColor?: string;
+  className?: string;
 };
 
-export type TextProps = ThemeProps & DefaultText['props'];
-export type ViewProps = ThemeProps & DefaultView['props'];
+export type TextProps = ThemeProps & RNText["props"];
+export type ViewProps = ThemeProps & RNView["props"];
+export type GradientProps = {
+  children?: React.ReactNode;
+  className?: string;
+  style?: any;
+};
 
-export function useThemeColor(
-  props: { light?: string; dark?: string },
-  colorName: keyof typeof Colors.light & keyof typeof Colors.dark
+/* -----------------------------
+   COLOR RESOLUTION
+--------------------------------*/
+function resolveColor(
+  theme: "light" | "dark",
+  lightColor?: string,
+  darkColor?: string
 ) {
-  const theme = useColorScheme() ?? 'light';
-  const colorFromProps = props[theme];
-
-  if (colorFromProps) {
-    return colorFromProps;
-  } else {
-    return Colors[theme][colorName];
-  }
+  return theme === "dark" ? darkColor : lightColor;
 }
 
-export function Text(props: TextProps) {
-  const { style, lightColor, darkColor, ...otherProps } = props;
-  const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
+/* --------------------------------------------------
+   THEMED SCROLL VIEW
+---------------------------------------------------*/
+export function ScrollView({
+  style,
+  lightColor,
+  darkColor,
+  className,
+  ...otherProps
+}: DefaultScrollViewProps & {
+  lightColor?: string;
+  darkColor?: string;
+  className?: string;
+}) {
+  const { colorScheme } = useColorScheme();
+  const theme = colorScheme === "dark" ? "dark" : "light";
 
-  return <DefaultText style={[{ color }, style]} {...otherProps} />;
+  // Background resolves exactly like your Text and View components:
+  const backgroundColor =
+    resolveColor(theme, lightColor, darkColor) ?? "transparent";
+
+  return (
+    <RNScrollView
+      className={className}
+      style={[{ backgroundColor }, style]}
+      showsVerticalScrollIndicator={false}
+      showsHorizontalScrollIndicator={false}
+      {...otherProps}
+    />
+  );
 }
 
-export function View(props: ViewProps) {
-  const { style, lightColor, darkColor, ...otherProps } = props;
-  const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
+/* --------------------------------------------------
+   THEMED TEXT
+---------------------------------------------------*/
+export function Text({ 
+  lightColor, 
+  darkColor, 
+  className, 
+  style, 
+  ...rest 
+}: TextProps) {
+  const { colorScheme } = useColorScheme();
+  const theme = colorScheme === "dark" ? "dark" : "light";
 
-  return <DefaultView style={[{ backgroundColor }, style]} {...otherProps} />;
+  // theme default
+  const themeColor = resolveColor(theme, lightColor, darkColor)
+    ?? (theme === "dark" ? "#ffffff" : "#000000");
+
+  return (
+    <RNText
+      className={className}
+      style={[
+        // theme fallback only if user didn't override
+        { color: themeColor },
+        // user’s style always wins
+        style,
+      ]}
+      {...rest}
+    />
+  );
+}
+
+/* --------------------------------------------------
+   THEMED VIEW
+---------------------------------------------------*/
+export function View({
+  lightColor,
+  darkColor,
+  className,
+  style,
+  ...rest
+}: ViewProps) {
+  const { colorScheme } = useColorScheme();
+  const theme = colorScheme === "dark" ? "dark" : "light";
+
+  const defaultBg = "transparent";
+  const overrideBg = resolveColor(theme, lightColor, darkColor);
+
+  return (
+    <RNView
+      className={className}
+      style={[
+        // theme background ONLY if user didn't override
+        { backgroundColor: overrideBg ?? defaultBg },
+        style,
+      ]}
+      {...rest}
+    />
+  );
+}
+
+/* --------------------------------------------------
+   THEMED CARD
+---------------------------------------------------*/
+export function ThemedCard({
+  className,
+  style,
+  lightColor,
+  darkColor,
+  ...rest
+}: ViewProps) {
+  const { colorScheme } = useColorScheme();
+  const theme = colorScheme === "dark" ? "dark" : "light";
+
+  const bg =
+    theme === "dark"
+      ? "rgba(0, 0, 0, 0.2)"
+      : "#ffffff";
+
+  const borderColor =
+    theme === "dark"
+      ? "rgba(255, 255, 255, 0.2)"
+      : "rgb(233, 213, 255)";
+
+  return (
+    <RNView
+      className={`rounded-2xl p-4 ${className ?? ""}`}
+      style={[
+        { backgroundColor: bg, borderWidth: 1, borderColor },
+        style, // user overrides win
+      ]}
+      {...rest}
+    />
+  );
+}
+
+/* --------------------------------------------------
+   THEMED GRADIENT BACKGROUND
+---------------------------------------------------*/
+export function ThemedGradientBackground({
+  children,
+  className,
+  style,
+}: GradientProps) {
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === "dark";
+
+  const colors: [string, string, string] = isDark
+    ? ["#020617", "#581c87", "#020617"]
+    : ["#faf5ff", "#fce7f3", "#faf5ff"];
+
+  return (
+    <LinearGradient
+      colors={colors}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      className={className}
+      style={style}
+    >
+      {children}
+    </LinearGradient>
+  );
+}
+
+/* --------------------------------------------------
+   TOP CONTACT GRADIENT CARD
+---------------------------------------------------*/
+export function ThemedTopContactGradient({
+  children,
+  className,
+  style,
+}: GradientProps) {
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === "dark";
+
+  const colors: [string, string] = isDark
+    ? ["rgba(168, 85, 247, 0.2)", "rgba(236, 72, 153, 0.2)"]
+    : ["rgb(243, 232, 255)", "rgb(252, 231, 243)"];
+
+  const borderColor = isDark
+    ? "rgba(168, 85, 247, 0.3)"
+    : "rgb(216, 180, 254)";
+
+  return (
+    <LinearGradient
+      colors={colors}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
+      className={`p-4 mb-6 ${className ?? ""}`}
+      style={[
+        { 
+          borderWidth: 1, 
+          borderColor,
+          borderRadius: 16
+        },
+        style, // user overrides win
+      ]}
+    >
+      {children}
+    </LinearGradient>
+  );
 }

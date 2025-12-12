@@ -1,31 +1,23 @@
-import { StyleSheet } from 'react-native';
-
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+import BalanceCard from '@/components/BalanceCard';
+import MetricCards from '@/components/MetricCards';
+import RecentActivity from '@/components/RecentActivity';
+import { ScrollView, ThemedGradientBackground } from '@/components/Themed';
+import TopContactCard from '@/components/TopContactCard';
 
 export default function TabOneScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
-    </View>
+    <ThemedGradientBackground className="flex-1 pt-5">
+      <ScrollView 
+        className="flex-1"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 40 }}
+      >
+        <BalanceCard />
+        <MetricCards />
+        <TopContactCard />
+        <RecentActivity />
+      </ScrollView>
+    </ThemedGradientBackground>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-});
