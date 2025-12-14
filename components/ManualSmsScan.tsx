@@ -1,0 +1,126 @@
+import { Text, ThemedCard, View } from "@/components/Themed";
+import { Feather } from "@expo/vector-icons";
+
+const scanOptions = [
+  {
+    value: "month",
+    label: "Scan This Month",
+    description: "Scan messages from the current month",
+  },
+  {
+    value: "all",
+    label: "Scan All Messages",
+    description: "Scan all historical messages",
+  },
+];
+
+type Props = {
+  isScanning: boolean;
+  scanComplete: boolean;
+  onScan: (value: string) => void;
+};
+
+export default function ManualSmsScan({
+  isScanning,
+  scanComplete,
+  onScan,
+}: Props) {
+  return (
+    <ThemedCard>
+      {/* Header */}
+      <View className="mb-3">
+        <Text className="font-medium">
+          Manual Message Scan
+        </Text>
+        <Text
+          className="text-sm mt-1"
+          lightColor="rgb(75,85,99)"
+          darkColor="rgb(156,163,175)"
+        >
+          Scan existing messages for transactions
+        </Text>
+      </View>
+
+      {/* Options */}
+      <View className="gap-3 mb-3">
+        {scanOptions.map(option => (
+          <View
+            key={option.value}
+            onTouchEnd={() => !isScanning && onScan(option.value)}
+            className="flex-row items-center gap-3 rounded-xl p-3 border"
+            lightColor="#ffffff"
+            darkColor="rgba(255,255,255,0.05)"
+            style={{
+              opacity: isScanning ? 0.6 : 1,
+            }}
+          >
+            <Feather
+              name="search"
+              size={20}
+              color="rgb(192,132,252)"
+            />
+
+            <View className="flex-1">
+              <Text className="font-medium">
+                {option.label}
+              </Text>
+              <Text
+                className="text-xs mt-1"
+                lightColor="rgb(75,85,99)"
+                darkColor="rgb(156,163,175)"
+              >
+                {option.description}
+              </Text>
+            </View>
+
+            {isScanning && (
+              <View className="w-4 h-4 rounded-full border border-purple-400" />
+            )}
+          </View>
+        ))}
+      </View>
+
+      {/* Scan Complete */}
+      {scanComplete && (
+        <View
+          className="flex-row gap-2 rounded-xl p-3 mb-3"
+          lightColor="rgba(34,197,94,0.1)"
+          darkColor="rgba(34,197,94,0.15)"
+        >
+          <Feather
+            name="check"
+            size={16}
+            color="rgb(34,197,94)"
+          />
+          <Text
+            className="text-sm"
+            lightColor="rgb(21,128,61)"
+            darkColor="rgb(134,239,172)"
+          >
+            Scan complete! Found and imported transaction messages.
+          </Text>
+        </View>
+      )}
+
+      {/* Info */}
+      <View
+        className="flex-row gap-2 rounded-xl p-3"
+        lightColor="rgb(239,246,255)"
+        darkColor="rgba(59,130,246,0.1)"
+      >
+        <Feather
+          name="info"
+          size={16}
+          color="rgb(59,130,246)"
+        />
+        <Text
+          className="text-xs flex-1"
+          lightColor="rgb(29,78,216)"
+          darkColor="rgb(147,197,253)"
+        >
+          Use manual scan to import historical transactions. This is useful for testing or one-time imports without enabling auto-scan.
+        </Text>
+      </View>
+    </ThemedCard>
+  );
+}

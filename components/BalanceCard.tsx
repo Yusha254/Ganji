@@ -4,7 +4,7 @@ import { Text, View } from "./Themed";
 
 export default function BalanceCard() {
   return (
-    <View className="mx-4 rounded-2xl overflow-hidden">
+    <View className="mx-4 my-4 rounded-2xl overflow-hidden">
     <LinearGradient
       className="p-6"
       colors={['#a855f7', '#ec4899']}

@@ -18,6 +18,9 @@ export type GradientProps = {
   style?: any;
 };
 
+const { colorScheme } = useColorScheme();
+const isDark = colorScheme === "dark";
+
 /* -----------------------------
    COLOR RESOLUTION
 --------------------------------*/
@@ -43,7 +46,6 @@ export function ScrollView({
   darkColor?: string;
   className?: string;
 }) {
-  const { colorScheme } = useColorScheme();
   const theme = colorScheme === "dark" ? "dark" : "light";
 
   // Background resolves exactly like your Text and View components:
@@ -71,7 +73,6 @@ export function Text({
   style, 
   ...rest 
 }: TextProps) {
-  const { colorScheme } = useColorScheme();
   const theme = colorScheme === "dark" ? "dark" : "light";
 
   // theme default
@@ -102,7 +103,6 @@ export function View({
   style,
   ...rest
 }: ViewProps) {
-  const { colorScheme } = useColorScheme();
   const theme = colorScheme === "dark" ? "dark" : "light";
 
   const defaultBg = "transparent";
@@ -131,7 +131,6 @@ export function ThemedCard({
   darkColor,
   ...rest
 }: ViewProps) {
-  const { colorScheme } = useColorScheme();
   const theme = colorScheme === "dark" ? "dark" : "light";
 
   const bg =
@@ -164,8 +163,6 @@ export function ThemedGradientBackground({
   className,
   style,
 }: GradientProps) {
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === "dark";
 
   const colors: [string, string, string] = isDark
     ? ["#020617", "#581c87", "#020617"]
@@ -192,8 +189,8 @@ export function ThemedTopContactGradient({
   className,
   style,
 }: GradientProps) {
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === "dark";
+
+  
 
   const colors: [string, string] = isDark
     ? ["rgba(168, 85, 247, 0.2)", "rgba(236, 72, 153, 0.2)"]

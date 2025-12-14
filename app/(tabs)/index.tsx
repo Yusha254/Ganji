@@ -6,7 +6,7 @@ import TopContactCard from '@/components/TopContactCard';
 
 export default function TabOneScreen() {
   return (
-    <ThemedGradientBackground className="flex-1 pt-5">
+    <ThemedGradientBackground className="flex-1">
       <ScrollView 
         className="flex-1"
         showsVerticalScrollIndicator={false}

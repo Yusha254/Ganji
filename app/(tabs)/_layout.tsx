@@ -1,10 +1,10 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Tabs } from 'expo-router';
+import { router, Tabs } from 'expo-router';
 import { useColorScheme } from 'nativewind';
 import React from 'react';
-import { Text } from 'react-native';
+import { Pressable, Text } from 'react-native';
 
 function TabBarIcon({
   name,
@@ -87,6 +87,19 @@ export default function TabLayout() {
         tabBarInactiveTintColor: isDark ? '#d1d5db' : '#374151',
         headerTitle: ({ children }) => <GradientHeaderTitle title={String(children)} />,
         headerTitleAlign: 'center',
+        headerRight: () => (
+          <Pressable
+            onPress={() => router.push("/settings")}
+            className="mr-4"
+            hitSlop={10}
+          >
+            <TabBarIcon
+              name="cog"
+              color={isDark ? "#d1d5db" : "#374151"}
+              isActive={true}
+            />
+          </Pressable>
+        ),
       }}
     >
       <Tabs.Screen
@@ -98,11 +111,19 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="transactions"
         options={{
           title: 'Transactions',
           headerTitle: () => <GradientHeaderTitle title="Transactions" />,
           tabBarIcon: ({ color, focused }) => <TabBarIcon name="list-alt" color={color} isActive={focused} />,
+        }}
+      />
+      <Tabs.Screen
+        name="analytics"
+        options={{
+          title: 'Analytics',
+          headerTitle: () => <GradientHeaderTitle title="Analytics" />,
+          tabBarIcon: ({ color, focused }) => <TabBarIcon name="line-chart" color={color} isActive={focused} />,
         }}
       />
     </Tabs>
