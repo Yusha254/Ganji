@@ -1,36 +1,52 @@
 import FilterTabs from "@/components/FilterTabs";
 import { ThemedGradientBackground, View } from "@/components/Themed";
 import TransactionList from "@/components/TransactionList";
-import { sampleTransactions } from "@/data";
+import { useTransactions } from "@/context/TransactionContext";
 import { useMemo, useState } from "react";
 
 export default function TransactionsScreen() {
+  const { transactions, loading } = useTransactions();
+
   const [activeFilter, setActiveFilter] =
     useState<"all" | "received" | "sent" | "debt">("all");
-
-  const counts = {
-    all: 42,
-    received: 12,
-    sent: 25,
-    debt: 5,
-  };
 
   const filteredTransactions = useMemo(() => {
     switch (activeFilter) {
       case "received":
-        return sampleTransactions.filter(t => t.isIncome && !t.isDebt);
+        return transactions.filter(
+          t => t.isIncome && !t.debt
+        );
+
       case "sent":
-        return sampleTransactions.filter(t => !t.isIncome && !t.isDebt);
+        return transactions.filter(
+          t => !t.isIncome && !t.debt
+        );
+
       case "debt":
-        return sampleTransactions.filter(t => t.isDebt);
+        return transactions.filter(
+          t => !!t.debt
+        );
+
       default:
-        return sampleTransactions;
+      return transactions;
     }
-  }, [activeFilter]);
+  }, [activeFilter, transactions]);
+
+
+  const counts = {
+    all: transactions.length,
+    received: transactions.filter(
+      t => t.isIncome && !t.debt
+    ).length,
+    sent: transactions.filter(
+      t => !t.isIncome && !t.debt
+    ).length,
+    debt: transactions.filter(t => t.debt).length,
+  };
 
   return (
     <ThemedGradientBackground className="flex-1 pt-5">
-      {/* Filters */}
+
       <View className="px-2 mb-4 flex-row justify-between">
         <FilterTabs
           activeFilter={activeFilter}
@@ -39,8 +55,11 @@ export default function TransactionsScreen() {
         />
       </View>
 
-      {/* Transaction list */}
-      <TransactionList transactions={filteredTransactions} />
+      <TransactionList
+        transactions={filteredTransactions}
+        loading={loading}
+      />
+
     </ThemedGradientBackground>
   );
 }

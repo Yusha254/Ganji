@@ -1,83 +1,140 @@
-import { Transaction } from "@/interfaces";
+import * as SQLite from 'expo-sqlite';
+import { SQLiteDatabase } from 'expo-sqlite';
+import { Debt, Transaction } from '../interfaces';
 
-export const sampleTransactions: Transaction[] = [
-  {
-    code: "QJ41ABC123",
-    amount: 350,
-    transactionCost: 12,
-    date: "9/8/25",
-    time: "1:44 PM",
-    isIncome: false,
-    isDebt: false,
-    isReversal: false,
-    isWithdrawal: false,
-    isDeposit: false,
-    name: "KPLC PREPAID",
-  },
-  {
-    code: "PL98XYZ556",
-    amount: 2000,
-    transactionCost: 0,
-    date: "9/8/25",
-    time: "9:12 AM",
-    isIncome: true,
-    isDebt: false,
-    isReversal: false,
-    isWithdrawal: false,
-    isDeposit: false,
-    name: "John Mwangi",
-  },
-  {
-    code: "AS76UIO333",
-    amount: 520,
-    transactionCost: 15,
-    date: "9/7/25",
-    time: "3:18 PM",
-    isIncome: false,
-    isDebt: true,
-    debtCost: 30,
-    isReversal: false,
-    isWithdrawal: false,
-    isDeposit: false,
-    name: "SafariCom Airtime",
-  },
-  {
-    code: "MP44LKJ990",
-    amount: 800,
-    transactionCost: 25,
-    date: "9/6/25",
-    time: "7:51 AM",
-    isIncome: false,
-    isDebt: false,
-    isReversal: true,
-    isWithdrawal: false,
-    isDeposit: false,
-    name: "Reversal — Wrong Number",
-  },
-  {
-    code: "XQ01MNB777",
-    amount: 1000,
-    transactionCost: 0,
-    date: "9/5/25",
-    time: "5:22 PM",
-    isIncome: false,
-    isDebt: false,
-    isReversal: false,
-    isWithdrawal: true,
-    isDeposit: false,
-    name: "ATM Withdrawal",
-  },
-  {
-    code: "LP66GTR222",
-    amount: 1500,
-    transactionCost: 0,
-    date: "9/4/25",
-    time: "11:30 AM",
-    isIncome: false,
-    isDebt: false,
-    isReversal: false,
-    isWithdrawal: false,
-    isDeposit: true,
-    name: "Cash Deposit",
-  },
-];
+/* ---------------- DATABASE INITIALIZATION ---------------- */
+
+let db: SQLiteDatabase | null = null;
+
+export async function initDatabase() {
+  db = await SQLite.openDatabaseAsync('ganji.db');
+
+  await db.execAsync(`
+    PRAGMA journal_mode = WAL;
+
+    -- TRANSACTIONS TABLE
+    CREATE TABLE IF NOT EXISTS transactions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      code TEXT UNIQUE NOT NULL,
+
+      amount REAL NOT NULL,
+      transactionCost REAL NOT NULL,
+
+      date TEXT NOT NULL,
+      time TEXT NOT NULL,
+
+      isIncome INTEGER NOT NULL,
+
+      isReversal INTEGER NOT NULL,
+      isWithdrawal INTEGER NOT NULL,
+      isDeposit INTEGER NOT NULL,
+
+      name TEXT
+    );
+
+    -- DEBTS TABLE
+    CREATE TABLE IF NOT EXISTS debts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      transactionCode TEXT UNIQUE NOT NULL,
+
+      debtAmount REAL NOT NULL,
+      interest REAL NOT NULL,
+      outstanding REAL NOT NULL,
+      dueDate TEXT NOT NULL,
+
+      createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
+
+      FOREIGN KEY (transactionCode)
+        REFERENCES transactions(code)
+        ON DELETE CASCADE
+    );
+
+    -- INDEXES (performance)
+    CREATE INDEX IF NOT EXISTS idx_transactions_code
+      ON transactions(code);
+
+    CREATE INDEX IF NOT EXISTS idx_debts_code
+      ON debts(transactionCode);
+  `);
+}
+
+export function getDb() {
+  if (!db) {
+    throw new Error('Database not initialized');
+  }
+  return db;
+}
+
+/* ---------------- INSERT FUNCTIONS ---------------- */
+
+/* ---------------- TRANSACTIONS ---------------- */
+
+export async function insertTransaction(tx: Transaction) {
+  const db = getDb();
+
+  try {
+    await db.runAsync(
+      `
+      INSERT OR IGNORE INTO transactions (
+        code,
+        amount,
+        transactionCost,
+        date,
+        time,
+        isIncome,
+        isReversal,
+        isWithdrawal,
+        isDeposit,
+        name
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      `,
+      [
+        tx.code,
+        tx.amount,
+        tx.transactionCost,
+        tx.date,
+        tx.time,
+
+        tx.isIncome ? 1 : 0,
+        tx.isReversal ? 1 : 0,
+        tx.isWithdrawal ? 1 : 0,
+        tx.isDeposit ? 1 : 0,
+
+        tx.name ?? null,
+      ]
+    );
+  } catch (error) {
+    console.error("Insert transaction failed:", error);
+    throw error;
+  }
+}
+
+/* ---------------- DEBTS ---------------- */
+
+export async function insertDebt(debt: Debt) {
+  const db = getDb();
+
+  try {
+    await db.runAsync(
+      `
+      INSERT OR IGNORE INTO debts (
+        transactionCode,
+        debtAmount,
+        interest,
+        outstanding,
+        dueDate
+      ) VALUES (?, ?, ?, ?, ?);
+      `,
+      [
+        debt.transactionCode,
+        debt.debtAmount,
+        debt.interest,
+        debt.outstanding,
+        debt.dueDate,
+      ]
+    );
+  } catch (error) {
+    console.error("Insert debt failed:", error);
+    throw error;
+  }
+}

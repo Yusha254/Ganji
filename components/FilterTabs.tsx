@@ -1,20 +1,8 @@
 import { Text, View } from "@/components/Themed";
+import { FilterTabsProps } from "@/interfaces";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Pressable, ScrollView } from "react-native";
-
-export type TransactionTypeRN = "received" | "sent" | "debt";
-
-interface FilterTabsProps {
-  activeFilter: TransactionTypeRN | "all";
-  onFilterChange: (filter: TransactionTypeRN | "all") => void;
-  counts: {
-    all: number;
-    received: number;
-    sent: number;
-    debt: number;
-  };
-}
 
 export default function FilterTabs({
   activeFilter,

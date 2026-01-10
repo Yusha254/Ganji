@@ -1,17 +1,12 @@
 // components/TransactionList.tsx
+import { ScrollView, Text, ThemedCard, View } from "@/components/Themed";
+import { Transaction, TransactionListProps } from "@/interfaces";
 import Feather from "@expo/vector-icons/Feather";
 import React, { useEffect, useMemo, useState } from "react";
-import { Pressable } from "react-native"; // RNView used minimally
-
-import { ScrollView, Text, ThemedCard, View } from "@/components/Themed";
-import { Transaction } from "@/interfaces";
+import { Pressable } from "react-native";
 import TransactionCard from "./TransactionCard";
 
-type Props = {
-  transactions: Transaction[];
-};
-
-export default function TransactionList({ transactions }: Props) {
+export default function TransactionList({ transactions }: TransactionListProps) {
   const [expandedMonths, setExpandedMonths] = useState<Set<string>>(new Set());
 
   // Group transactions by "Month Year" e.g. "August 2025"

@@ -1,11 +1,22 @@
 import { Text, ThemedCard, View } from "@/components/Themed";
+import { ManualSmsProps } from "@/interfaces";
 import { Feather } from "@expo/vector-icons";
 
 const scanOptions = [
   {
+    value: "two_weeks",
+    label: "Scan Last Two Weeks",
+    description: "Scan messages from the last two weeks",
+  },
+  {
     value: "month",
     label: "Scan This Month",
     description: "Scan messages from the current month",
+  },
+  {
+    value: "three_months",
+    label: "Scan Last Three Months",
+    description: "Scan messages from the last three months",
   },
   {
     value: "all",
@@ -14,17 +25,11 @@ const scanOptions = [
   },
 ];
 
-type Props = {
-  isScanning: boolean;
-  scanComplete: boolean;
-  onScan: (value: string) => void;
-};
-
 export default function ManualSmsScan({
   isScanning,
   scanComplete,
   onScan,
-}: Props) {
+}: ManualSmsProps) {
   return (
     <ThemedCard>
       {/* Header */}

@@ -1,3 +1,5 @@
+/*------------------- GLOBAL INTERFACES ------------------*/
+
 export interface Transaction {
   code: string;
   amount: number;
@@ -6,8 +8,6 @@ export interface Transaction {
   time: string;
 
   isIncome: boolean;
-  isDebt: boolean;
-  debtCost?: number;
 
   isReversal: boolean;
   isWithdrawal: boolean;
@@ -15,3 +15,81 @@ export interface Transaction {
 
   name?: string;
 }
+
+export interface Debt {
+  transactionCode: string;
+
+  debtAmount: number;
+  interest: number;
+  outstanding: number;
+  dueDate: string;
+}
+
+/*------------------- UTIL/SERVICES TYPES ------------------*/
+export type MpesaMessageType =
+  | "TRANSACTION"
+  | "WITHDRAWAL"
+  | "REVERSAL"
+  | "FULIZA_DEBT"
+  | "FULIZA_REPAYMENT"
+  | "UNKNOWN";
+
+export type SmsScanRange =
+  | "two_weeks"
+  | "month"
+  | "three_months"
+  | "all";
+
+export type IngestResult = {
+  insertedTransactions: number;
+  insertedDebts: number;
+  skipped: number;
+};
+
+/*------------------- CONTEXT TYPES ------------------*/
+export type TransactionContextType = {
+  transactions: TransactionWithDebt[];
+  loading: boolean;
+  refresh: () => Promise<void>;
+};
+
+export interface TransactionWithDebt extends Transaction {
+  debt?: { 
+    debtAmount: number; 
+    interest: number; 
+    outstanding: number; 
+    dueDate: string; 
+  } | null; 
+}
+
+/*------------------- COMPONENT PROPS ------------------*/
+export type AutoSmsProps = {
+  smsPermission: boolean;
+  onToggle: () => void;
+};
+
+type TransactionType = "received" | "sent" | "debt";
+
+export interface FilterTabsProps {
+  activeFilter: TransactionType | "all";
+  onFilterChange: (filter: TransactionType | "all") => void;
+  counts: {
+    all: number;
+    received: number;
+    sent: number;
+    debt: number;
+  };
+}
+
+export type ManualSmsProps = {
+  isScanning: boolean;
+  scanComplete: boolean;
+  onScan: (value: string) => void;
+};
+
+export type TransactionListProps = {
+  transactions: TransactionWithDebt[];
+  loading?: boolean;
+};
+
+

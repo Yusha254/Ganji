@@ -1,14 +1,14 @@
 import { Text, View } from "@/components/Themed";
-import { Transaction } from "@/interfaces";
+import { TransactionWithDebt } from "@/interfaces";
 import Feather from "@expo/vector-icons/Feather";
 import { useState } from "react";
 import { Pressable } from "react-native";
 
-export default function TransactionCard({ transaction }: { transaction: Transaction }) {
+export default function TransactionCard({ transaction }: { transaction: TransactionWithDebt }) {
   const [expanded, setExpanded] = useState(false);
 
   const isReceived = transaction.amount > 0;
-  const isDebt = !!transaction.debtCost;
+  const isDebt = !!transaction.debt;
 
   return (
     <Pressable onPress={() => setExpanded((p) => !p)}>
@@ -116,7 +116,7 @@ export default function TransactionCard({ transaction }: { transaction: Transact
                   <Text className="text-orange-300">Debt Cost</Text>
                 </View>
                 <Text className="text-orange-300">
-                  KSh {transaction.debtCost}
+                  KSh {transaction.debt?.interest}
                 </Text>
               </View>
             )}
@@ -140,7 +140,7 @@ export default function TransactionCard({ transaction }: { transaction: Transact
                 {(
                   Math.abs(transaction.amount) +
                   transaction.transactionCost +
-                  (transaction.debtCost || 0)
+                  (transaction.debt?.interest || 0)
                 ).toFixed(2)}
               </Text>
             </View>

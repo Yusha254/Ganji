@@ -1,17 +1,13 @@
 import { Text, ThemedCard, View } from "@/components/Themed";
+import { AutoSmsProps } from "@/interfaces";
 import { Feather } from "@expo/vector-icons";
-
-type Props = {
-  smsPermission: boolean;
-  onToggle: () => void;
-};
 
 export default function AutoSmsScan({
   smsPermission,
   onToggle,
-}: Props) {
+}: AutoSmsProps) {
   return (
-    <ThemedCard>
+    <ThemedCard className="mb-4">
       {/* Main Row */}
       <View className="flex-row items-center justify-between mb-4">
         <View className="flex-row items-center gap-3 flex-1">
