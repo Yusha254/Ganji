@@ -1,5 +1,5 @@
 // OverviewMetricCards.tsx
-
+//now let's do this component
 import { Text, ThemedCard, View } from "@/components/Themed";
 import { FontAwesome, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";

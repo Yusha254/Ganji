@@ -9,13 +9,12 @@ let db: SQLiteDatabase | null = null;
 export async function initDatabase() {
   db = await SQLite.openDatabaseAsync('ganji.db');
 
-  await db.execAsync(`
+  await db.execSync(`
     PRAGMA journal_mode = WAL;
 
     -- TRANSACTIONS TABLE
     CREATE TABLE IF NOT EXISTS transactions (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      code TEXT UNIQUE NOT NULL,
+      code TEXT PRIMARY KEY UNIQUE NOT NULL,
 
       amount REAL NOT NULL,
       transactionCost REAL NOT NULL,
@@ -34,8 +33,7 @@ export async function initDatabase() {
 
     -- DEBTS TABLE
     CREATE TABLE IF NOT EXISTS debts (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      transactionCode TEXT UNIQUE NOT NULL,
+      transactionCode TEXT PRIMARY KEY UNIQUE NOT NULL,
 
       debtAmount REAL NOT NULL,
       interest REAL NOT NULL,
@@ -55,6 +53,12 @@ export async function initDatabase() {
 
     CREATE INDEX IF NOT EXISTS idx_debts_code
       ON debts(transactionCode);
+
+    -- SETTINGS TABLE
+    CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY UNIQUE NOT NULL,
+      value TEXT NOT NULL
+    );
   `);
 }
 
@@ -137,4 +141,36 @@ export async function insertDebt(debt: Debt) {
     console.error("Insert debt failed:", error);
     throw error;
   }
+}
+
+export async function deleteAllData() {
+  const db = getDb();
+  await db.execAsync(`
+    DELETE FROM transactions;
+    DELETE FROM debts;
+  `);
+}
+
+/* ---------------- SETTINGS ---------------- */
+
+export async function setSetting(key: string, value: string) {
+  const db = getDb();
+  await db.runAsync(
+    `
+    INSERT OR REPLACE INTO settings (key, value)
+    VALUES (?, ?);
+    `,
+    [key, value]
+  );
+}
+
+export async function getSetting(key: string): Promise<string | null> {
+  const db = getDb();
+
+  const res = await db.getFirstAsync<{ value: string }>(
+    `SELECT value FROM settings WHERE key = ?`,
+    [key]
+  );
+
+  return res?.value ?? null;
 }

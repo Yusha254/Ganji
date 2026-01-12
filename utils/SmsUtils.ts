@@ -1,6 +1,6 @@
 import { PermissionsAndroid, Platform } from "react-native";
 import SmsAndroid from "react-native-get-sms-android";
-import { SmsScanRange } from "../interfaces";
+import { RawSms, SmsScanRange } from "../interfaces";
 
 export async function requestSmsPermission(): Promise<boolean> {
   if (Platform.OS !== "android") return false;
@@ -41,7 +41,7 @@ function getMinDate(range: SmsScanRange): number | undefined {
 
 export async function scanMpesaMessages(
   range: SmsScanRange
-): Promise<string[]> {
+): Promise<RawSms[]> {
   if (Platform.OS !== "android") return [];
 
   const granted = await requestSmsPermission();
@@ -58,7 +58,7 @@ export async function scanMpesaMessages(
         box: "inbox",
         address: "MPESA",
         ...(minDate ? { minDate } : {}),
-        // ❌ no maxCount → fetch everything available
+        
       }),
       (fail) => {
         console.error("❌ SMS scan failed:", fail);
@@ -87,7 +87,10 @@ export async function scanMpesaMessages(
                 typeof m.address === "string" &&
                 m.address.toUpperCase() === "MPESA"
             )
-            .map((m) => m.body);
+            .map((m) => ({
+              body: m.body,
+              date: m.date,
+            }));
 
           resolve(messages);
         } catch (err) {

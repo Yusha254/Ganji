@@ -32,6 +32,7 @@ export type MpesaMessageType =
   | "REVERSAL"
   | "FULIZA_DEBT"
   | "FULIZA_REPAYMENT"
+  | "DEPOSIT"
   | "UNKNOWN";
 
 export type SmsScanRange =
@@ -45,6 +46,11 @@ export type IngestResult = {
   insertedDebts: number;
   skipped: number;
 };
+
+export interface RawSms {
+  body: string;
+  date: number;
+}
 
 /*------------------- CONTEXT TYPES ------------------*/
 export type TransactionContextType = {
@@ -60,6 +66,32 @@ export interface TransactionWithDebt extends Transaction {
     outstanding: number; 
     dueDate: string; 
   } | null; 
+}
+
+export interface ContactStats {
+  name: string;
+  count: number;       // number of transactions
+  totalAmount: number; // total amount sent/received
+  rank: number;        // ranking
+}
+
+export interface AnalyticsData {
+  totalSent: number;
+  totalReceived: number;
+  totalTransactions: number;
+  totalTransactionCost: number;
+  totalContacts: number;
+  mostFrequentContacts: ContactStats[]; // by number of transactions
+  highestSpendingContacts: ContactStats[]; // by total amount spent
+  averageTransactionCost: number;
+  monthlyTransactionCosts: Record<string, number>; // monthKey => total cost
+  monthlyTotals: Record<string, { sent: number; received: number }>; // for each month
+  last6MonthsTotals: { sent: number; received: number };
+  last12MonthsTotals: { sent: number; received: number };
+}
+
+export interface AnalyticsContextType {
+  analytics: AnalyticsData;
 }
 
 /*------------------- COMPONENT PROPS ------------------*/

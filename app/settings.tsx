@@ -7,6 +7,7 @@ import ManualSmsScan from "@/components/ManualSmsScan";
 import SecuritySection from "@/components/SecuritySection";
 import { ScrollView, ThemedGradientBackground } from "@/components/Themed";
 import { useTransactions } from "@/context/TransactionContext";
+import { deleteAllData } from "@/data";
 import { useSmsScanner } from "@/hooks/useSmsScanner";
 import { SmsScanRange } from "@/interfaces";
 import { useState } from "react";
@@ -20,15 +21,19 @@ export default function SettingsScreen() {
   const {
     scanAndSave,
     loading,
-  } = useSmsScanner(false);
+  } = useSmsScanner();
 
   async function handleManualScan(range: SmsScanRange) {
     setScanComplete(false);
-    await scanAndSave(selectedRange);
+    await scanAndSave(range);
     setScanComplete(true);
     await refresh();
   }
 
+  async function handleDeleteAll() {
+    await deleteAllData();
+    await refresh();
+  }
 
   return (
     <ThemedGradientBackground className="flex-1 px-4">
@@ -46,6 +51,7 @@ export default function SettingsScreen() {
           setSelectedRange(range as SmsScanRange);
           handleManualScan(range as SmsScanRange);
         }}
+        onDeleteAll={handleDeleteAll}
       />
 
       <AboutSection />

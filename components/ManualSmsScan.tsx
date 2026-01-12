@@ -1,6 +1,7 @@
 import { Text, ThemedCard, View } from "@/components/Themed";
 import { ManualSmsProps } from "@/interfaces";
 import { Feather } from "@expo/vector-icons";
+import { Alert } from "react-native";
 
 const scanOptions = [
   {
@@ -29,7 +30,26 @@ export default function ManualSmsScan({
   isScanning,
   scanComplete,
   onScan,
-}: ManualSmsProps) {
+  onDeleteAll, // 👈 add this
+}: ManualSmsProps & {
+  onDeleteAll: () => void;
+}) {
+
+  function confirmDelete() {
+    Alert.alert(
+      "Delete all data",
+      "This will permanently delete all transactions and debts. This action cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: onDeleteAll,
+        },
+      ]
+    );
+  }
+
   return (
     <ThemedCard>
       {/* Header */}
@@ -106,6 +126,28 @@ export default function ManualSmsScan({
           </Text>
         </View>
       )}
+
+      {/* DELETE BUTTON */}
+      <View
+        onTouchEnd={confirmDelete}
+        className="
+          flex-row items-center gap-3 
+          rounded-xl p-3 mb-3
+          border border-red-500/30
+        "
+        darkColor="#f5656519"
+        lightColor="#f5656519"
+      >
+        <Feather
+          name="trash-2"
+          size={18}
+          color="rgb(239,68,68)"
+        />
+
+        <Text className="font-medium text-red-400">
+          Delete all data
+        </Text>
+      </View>
 
       {/* Info */}
       <View

@@ -7,7 +7,7 @@ import { Pressable } from "react-native";
 export default function TransactionCard({ transaction }: { transaction: TransactionWithDebt }) {
   const [expanded, setExpanded] = useState(false);
 
-  const isReceived = transaction.amount > 0;
+  const isReceived = transaction.isIncome;
   const isDebt = !!transaction.debt;
 
   return (
@@ -18,11 +18,10 @@ export default function TransactionCard({ transaction }: { transaction: Transact
           rounded-2xl 
           p-4
           border 
-          bg-white/5 
-          dark:bg-white/5 
           border-white/10 
-          dark:border-white/10
         "
+        lightColor="#ffffff"
+        darkColor="#FFFFFF26"
       >
         {/* Top Row */}
         <View className="flex-row justify-between">
@@ -67,7 +66,7 @@ export default function TransactionCard({ transaction }: { transaction: Transact
                 ${isReceived ? "text-green-400" : "text-red-400"}
               `}
             >
-              {isReceived ? "+" : "-"}KSh {Math.abs(transaction.amount)}
+              KSh {Math.abs(transaction.amount)}
             </Text>
 
             {transaction.transactionCost > 0 && (

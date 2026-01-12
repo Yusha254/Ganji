@@ -1,7 +1,13 @@
+//something wrong here
+
 import { Text, ThemedCard, View } from "@/components/Themed";
+import { useAnalytics } from "@/context/AnalyticsContext";
 import { FontAwesome5 } from "@expo/vector-icons";
 
 export default function HighestSpendingContactsCard() {
+  const { highestSpendingContacts } = useAnalytics();
+
+  const topContacts = highestSpendingContacts.slice(0, 5);
   return (
     <View className="mb-6">
       {/* Section Title */}
@@ -17,33 +23,44 @@ export default function HighestSpendingContactsCard() {
       </View>
 
       <ThemedCard>
-        <View className="flex-row justify-between items-center">
-          <View className="flex-row items-center gap-3 flex-1">
-            <View className="w-8 h-8 rounded-full bg-pink-400/20 items-center justify-center">
-              <Text className="text-sm text-pink-400">#1</Text>
-            </View>
+        <View className="flex-col gap-4">
+          {topContacts.map((contact) => {
+            const avg =
+              contact.count > 0
+                ? contact.totalAmount / contact.count
+                : 0;
 
-            <View className="flex-1">
-              <Text
-                className="font-medium"
-                numberOfLines={1}
-              >
-                Jane Smith
-              </Text>
-              <Text className="text-sm text-gray-400">
-                22 transactions
-              </Text>
-            </View>
-          </View>
+            return (
+              <View className="flex-row justify-between items-center">
+                <View className="flex-row items-center gap-3 flex-1">
+                  <View className="w-8 h-8 rounded-full bg-pink-400/20 items-center justify-center">
+                    <Text className="text-sm text-pink-400">#{contact.rank}</Text>
+                  </View>
 
-          <View className="items-end">
-            <Text className="text-red-400">
-              KSh 18,900
-            </Text>
-            <Text className="text-xs text-gray-400">
-              KSh 26.40 avg fee
-            </Text>
-          </View>
+                  <View className="flex-1">
+                    <Text
+                      className="font-medium"
+                      numberOfLines={1}
+                    >
+                      {contact.name}
+                    </Text>
+                    <Text className="text-sm text-gray-400">
+                      {contact.count} transactions
+                    </Text>
+                  </View>
+                </View>
+
+                <View className="items-end">
+                  <Text className="text-red-400">
+                    KSh {contact.totalAmount.toLocaleString()}
+                  </Text>
+                  <Text className="text-xs text-gray-400">
+                    KSh {avg.toFixed(2)} avg fee
+                  </Text>
+                </View>
+              </View>
+            );
+          })}
         </View>
       </ThemedCard>
     </View>

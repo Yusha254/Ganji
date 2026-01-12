@@ -1,16 +1,18 @@
 import { insertDebt, insertTransaction } from "../data";
-import { Debt, IngestResult, Transaction } from "../interfaces";
+import { Debt, IngestResult, RawSms, Transaction } from "../interfaces";
 import { parseMpesaMessage } from "../utils/SmsParser";
 
 export async function ingestSmsMessages(
-  messages: string[]
+  messages: RawSms[]
 ): Promise<IngestResult> {
   let insertedTx = 0;
   let insertedDebt = 0;
   let skipped = 0;
 
   for (const sms of messages) {
-    const parsed = parseMpesaMessage(sms);
+    
+    const parsed = parseMpesaMessage(sms.body, sms.date);
+    
 
     if (!parsed) {
       skipped++;
@@ -30,10 +32,12 @@ export async function ingestSmsMessages(
         insertedDebt++;
       }
     } catch (err: any) {
+      console.error("Insert failed for SMS:", sms.body);
       // duplicate constraint etc
       skipped++;
     }
   }
+  console.log(`Ingested: ${insertedTx} transactions, ${insertedDebt} debts, skipped ${skipped} messages.`);
 
   return {
     insertedTransactions: insertedTx,

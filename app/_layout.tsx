@@ -1,4 +1,5 @@
 import { useColorScheme } from '@/components/useColorScheme';
+import { AnalyticsProvider } from '@/context/AnalyticsContext';
 import { TransactionProvider } from '@/context/TransactionContext';
 import { initDatabase } from '@/data';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -57,10 +58,12 @@ function RootLayoutNav() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <TransactionProvider>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-        </Stack>
+        <AnalyticsProvider>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+          </Stack>
+        </AnalyticsProvider>
       </TransactionProvider>
     </ThemeProvider>
   );

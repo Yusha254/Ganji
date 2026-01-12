@@ -1,6 +1,6 @@
-// components/TransactionList.tsx
 import { ScrollView, Text, ThemedCard, View } from "@/components/Themed";
 import { Transaction, TransactionListProps } from "@/interfaces";
+import { toISODateTime } from "@/utils/DateUtils";
 import Feather from "@expo/vector-icons/Feather";
 import React, { useEffect, useMemo, useState } from "react";
 import { Pressable } from "react-native";
@@ -16,7 +16,7 @@ export default function TransactionList({ transactions }: TransactionListProps) 
     transactions.forEach((t) => {
       // Attempt to construct a Date from your date/time strings.
       // If your date format is ambiguous, adapt the parsing logic here.
-      const d = new Date(`${t.date} ${t.time}`);
+      const d = new Date(toISODateTime(t.date, t.time));
       const key = `${d.toLocaleString("default", { month: "long" })} ${d.getFullYear()}`;
 
       if (!groups[key]) groups[key] = [];
@@ -32,8 +32,8 @@ export default function TransactionList({ transactions }: TransactionListProps) 
     keys.sort((a, b) => {
       const ga = grouped[a][0];
       const gb = grouped[b][0];
-      const da = new Date(`${ga.date} ${ga.time}`).getTime();
-      const db = new Date(`${gb.date} ${gb.time}`).getTime();
+      const da = new Date(toISODateTime(ga.date, ga.time)).getTime();
+      const db = new Date(toISODateTime(gb.date, gb.time)).getTime();
       return db - da;
     });
     return keys;
@@ -76,12 +76,15 @@ export default function TransactionList({ transactions }: TransactionListProps) 
           const isOpen = expandedMonths.has(monthKey);
 
           // month total (sum of amounts)
-          const monthTotal = monthTx.reduce((sum, t) => sum + t.amount, 0);
+          const monthTotal = monthTx.reduce((sum, t) => {
+            // treat income as positive, spending as negative
+            return sum + (t.isIncome ? t.amount : -t.amount);
+          }, 0);
 
           // sort transactions: newest -> oldest
           const sortedTx = [...monthTx].sort((a, b) => {
-            const da = new Date(`${a.date} ${a.time}`).getTime();
-            const db = new Date(`${b.date} ${b.time}`).getTime();
+            const da = new Date(toISODateTime(a.date, a.time)).getTime();
+            const db = new Date(toISODateTime(b.date, b.time)).getTime();
             return db - da;
           });
 

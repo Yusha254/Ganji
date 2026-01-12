@@ -26,7 +26,6 @@ export function TransactionProvider({
       const debts = await db.getAllAsync<Debt>(
         `SELECT * FROM debts`
       );
-      console.log("Fetched transactions and debts:", transactions, debts);
       // Map debts by transactionCode
         const debtMap = new Map(
             debts.map(d => [d.transactionCode, d])

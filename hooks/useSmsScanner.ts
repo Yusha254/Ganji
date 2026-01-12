@@ -3,7 +3,7 @@ import { IngestResult, SmsScanRange } from "../interfaces";
 import { ingestSmsMessages } from "../services/smsIngestService";
 import { scanMpesaMessages } from "../utils/SmsUtils";
 
-export function useSmsScanner(auto = false) {
+export function useSmsScanner(defaultRange: SmsScanRange =  "two_weeks", auto = false) {
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState<IngestResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -28,9 +28,9 @@ export function useSmsScanner(auto = false) {
 
   useEffect(() => {
     if (auto) {
-      scanAndSave("two_weeks");
+      scanAndSave(defaultRange);
     }
-  }, [auto, scanAndSave]);
+  }, [auto, defaultRange ,scanAndSave]);
 
   return {
     scanAndSave,

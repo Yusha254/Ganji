@@ -1,10 +1,12 @@
+
+
 import { Text, ThemedCard, View } from "@/components/Themed";
+import { useAppTheme } from "@/hooks/useAppTheme";
 import { Feather } from "@expo/vector-icons";
-import { useColorScheme } from "nativewind";
 
 export default function AppearanceSection() {
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { mode, changeTheme } = useAppTheme();
+  const isDark = mode === "dark" || (mode === "system" && useAppTheme().resolvedTheme === "dark");
 
   return (
     <View className="mb-8">
@@ -50,33 +52,21 @@ export default function AppearanceSection() {
 
           {/* Theme Buttons (static) */}
           <View className="flex-row gap-2">
-            <View
-              className="p-2 rounded-lg"
-              lightColor="rgb(168,85,247)"
-              darkColor="rgb(168,85,247)"
-            >
-              <Feather
-                name="sun"
-                size={20}
-                color="#ffffff"
-              />
-            </View>
-
-            <View
-              className="p-2 rounded-lg"
-              lightColor="rgb(243,232,255)"
-              darkColor="rgba(255,255,255,0.05)"
-            >
-              <Feather
-                name="moon"
-                size={20}
-                color={
-                  isDark
-                    ? "rgb(156,163,175)"
-                    : "rgb(75,85,99)"
-                }
-              />
-            </View>
+            <ThemeButton
+              icon="sun"
+              active={mode === "light"}
+              onPress={() => changeTheme("light")}
+            />
+            <ThemeButton
+              icon="moon"
+              active={mode === "dark"}
+              onPress={() => changeTheme("dark")}
+            />
+            <ThemeButton
+              icon="smartphone"
+              active={mode === "system"}
+              onPress={() => changeTheme("system")}
+            />
           </View>
         </View>
 
@@ -105,6 +95,36 @@ export default function AppearanceSection() {
           </Text>
         </View>
       </ThemedCard>
+    </View>
+  );
+}
+
+
+function ThemeButton({
+  icon,
+  active,
+  onPress,
+}: any) {
+  return (
+    <View
+      onTouchEnd={onPress}
+      className="p-2 rounded-lg"
+      lightColor={
+        active
+          ? "rgb(168,85,247)"
+          : "rgb(243,232,255)"
+      }
+      darkColor={
+        active
+          ? "rgb(168,85,247)"
+          : "rgba(255,255,255,0.05)"
+      }
+    >
+      <Feather
+        name={icon}
+        size={20}
+        color={active ? "#fff" : "#888"}
+      />
     </View>
   );
 }

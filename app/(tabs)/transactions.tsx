@@ -14,7 +14,7 @@ export default function TransactionsScreen() {
     switch (activeFilter) {
       case "received":
         return transactions.filter(
-          t => t.isIncome && !t.debt
+          t => t.isIncome
         );
 
       case "sent":
