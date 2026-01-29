@@ -2,12 +2,19 @@
 
 import { LinearGradient } from "expo-linear-gradient";
 import { useColorScheme } from "nativewind";
-import { ScrollViewProps as DefaultScrollViewProps, ScrollView as RNScrollView, Text as RNText, View as RNView } from "react-native";
+import {
+  ScrollViewProps as DefaultScrollViewProps,
+  ScrollView as RNScrollView,
+  Text as RNText,
+  View as RNView,
+} from "react-native";
 
 export type ThemeProps = {
   lightColor?: string;
   darkColor?: string;
   className?: string;
+  lightBorderColor?: string;
+  darkBorderColor?: string;
 };
 
 export type TextProps = ThemeProps & RNText["props"];
@@ -27,7 +34,7 @@ const isDark = colorScheme === "dark";
 function resolveColor(
   theme: "light" | "dark",
   lightColor?: string,
-  darkColor?: string
+  darkColor?: string,
 ) {
   return theme === "dark" ? darkColor : lightColor;
 }
@@ -66,18 +73,19 @@ export function ScrollView({
 /* --------------------------------------------------
    THEMED TEXT
 ---------------------------------------------------*/
-export function Text({ 
-  lightColor, 
-  darkColor, 
-  className, 
-  style, 
-  ...rest 
+export function Text({
+  lightColor,
+  darkColor,
+  className,
+  style,
+  ...rest
 }: TextProps) {
   const theme = colorScheme === "dark" ? "dark" : "light";
 
   // theme default
-  const themeColor = resolveColor(theme, lightColor, darkColor)
-    ?? (theme === "dark" ? "#ffffff" : "#000000");
+  const themeColor =
+    resolveColor(theme, lightColor, darkColor) ??
+    (theme === "dark" ? "#ffffff" : "#000000");
 
   return (
     <RNText
@@ -99,6 +107,8 @@ export function Text({
 export function View({
   lightColor,
   darkColor,
+  lightBorderColor,
+  darkBorderColor,
   className,
   style,
   ...rest
@@ -107,6 +117,7 @@ export function View({
 
   const defaultBg = "transparent";
   const overrideBg = resolveColor(theme, lightColor, darkColor);
+  const borderColor = resolveColor(theme, lightBorderColor, darkBorderColor);
 
   return (
     <RNView
@@ -114,6 +125,7 @@ export function View({
       style={[
         // theme background ONLY if user didn't override
         { backgroundColor: overrideBg ?? defaultBg },
+        borderColor ? { borderColor } : {},
         style,
       ]}
       {...rest}
@@ -133,15 +145,10 @@ export function ThemedCard({
 }: ViewProps) {
   const theme = colorScheme === "dark" ? "dark" : "light";
 
-  const bg =
-    theme === "dark"
-      ? "rgba(0, 0, 0, 0.2)"
-      : "#ffffff";
+  const bg = theme === "dark" ? "rgba(0, 0, 0, 0.2)" : "#ffffff";
 
   const borderColor =
-    theme === "dark"
-      ? "rgba(255, 255, 255, 0.2)"
-      : "rgb(233, 213, 255)";
+    theme === "dark" ? "rgba(255, 255, 255, 0.2)" : "rgb(233, 213, 255)";
 
   return (
     <RNView
@@ -163,7 +170,6 @@ export function ThemedGradientBackground({
   className,
   style,
 }: GradientProps) {
-
   const colors: [string, string, string] = isDark
     ? ["#020617", "#581c87", "#020617"]
     : ["#faf5ff", "#fce7f3", "#faf5ff"];
@@ -189,16 +195,11 @@ export function ThemedTopContactGradient({
   className,
   style,
 }: GradientProps) {
-
-  
-
   const colors: [string, string] = isDark
     ? ["rgba(168, 85, 247, 0.2)", "rgba(236, 72, 153, 0.2)"]
     : ["rgb(243, 232, 255)", "rgb(252, 231, 243)"];
 
-  const borderColor = isDark
-    ? "rgba(168, 85, 247, 0.3)"
-    : "rgb(216, 180, 254)";
+  const borderColor = isDark ? "rgba(168, 85, 247, 0.3)" : "rgb(216, 180, 254)";
 
   return (
     <LinearGradient
@@ -207,12 +208,12 @@ export function ThemedTopContactGradient({
       end={{ x: 1, y: 0 }}
       className={`p-4 mb-6 ${className ?? ""}`}
       style={[
-        { 
-          borderWidth: 1, 
+        {
+          borderWidth: 1,
           borderColor,
-          borderRadius: 16
+          borderRadius: 16,
         },
-        style, // user overrides win
+        style,
       ]}
     >
       {children}

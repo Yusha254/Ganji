@@ -1,14 +1,14 @@
 // TopContactCard.tsx
 import { Text, ThemedTopContactGradient, View } from "@/components/Themed";
+import { TopContactCardProps } from "@/interfaces";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 
-export default function TopContactCard() {
+export default function TopContactCard({ topContact }: TopContactCardProps) {
   return (
     <View className="mx-4 rounded-2xl overflow-hidden">
-      <ThemedTopContactGradient >
+      <ThemedTopContactGradient>
         <View className="flex-row justify-between items-center">
-
           {/* LEFT TEXT AREA */}
           <View className="flex-col">
             <Text
@@ -19,16 +19,10 @@ export default function TopContactCard() {
               Most Frequent Contact
             </Text>
 
-            <Text className="text-xl font-semibold">
-              Sarah Chen
-            </Text>
+            <Text className="text-xl font-semibold">{topContact.name}</Text>
 
-            <Text
-              className="text-sm"
-              darkColor="#9ca3af"
-              lightColor="#4b5563"
-            >
-              22 transactions
+            <Text className="text-sm" darkColor="#9ca3af" lightColor="#4b5563">
+              {topContact.count} transactions
             </Text>
           </View>
 
@@ -41,9 +35,8 @@ export default function TopContactCard() {
           >
             <Ionicons name="people" size={22} color="#ffffff" />
           </View>
-
         </View>
       </ThemedTopContactGradient>
-    </ View>
+    </View>
   );
 }

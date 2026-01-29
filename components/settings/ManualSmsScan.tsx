@@ -34,7 +34,6 @@ export default function ManualSmsScan({
 }: ManualSmsProps & {
   onDeleteAll: () => void;
 }) {
-
   function confirmDelete() {
     Alert.alert(
       "Delete all data",
@@ -46,17 +45,15 @@ export default function ManualSmsScan({
           style: "destructive",
           onPress: onDeleteAll,
         },
-      ]
+      ],
     );
   }
 
   return (
-    <ThemedCard>
+    <ThemedCard className="mb-8">
       {/* Header */}
       <View className="mb-3">
-        <Text className="font-medium">
-          Manual Message Scan
-        </Text>
+        <Text className="font-medium">Manual Message Scan</Text>
         <Text
           className="text-sm mt-1"
           lightColor="rgb(75,85,99)"
@@ -68,7 +65,7 @@ export default function ManualSmsScan({
 
       {/* Options */}
       <View className="gap-3 mb-3">
-        {scanOptions.map(option => (
+        {scanOptions.map((option) => (
           <View
             key={option.value}
             onTouchEnd={() => !isScanning && onScan(option.value)}
@@ -79,16 +76,10 @@ export default function ManualSmsScan({
               opacity: isScanning ? 0.6 : 1,
             }}
           >
-            <Feather
-              name="search"
-              size={20}
-              color="rgb(192,132,252)"
-            />
+            <Feather name="search" size={20} color="rgb(192,132,252)" />
 
             <View className="flex-1">
-              <Text className="font-medium">
-                {option.label}
-              </Text>
+              <Text className="font-medium">{option.label}</Text>
               <Text
                 className="text-xs mt-1"
                 lightColor="rgb(75,85,99)"
@@ -99,7 +90,11 @@ export default function ManualSmsScan({
             </View>
 
             {isScanning && (
-              <View className="w-4 h-4 rounded-full border border-purple-400" />
+              <View
+                className="w-4 h-4 rounded-full border"
+                lightBorderColor="#c084fc"
+                darkBorderColor="#c084fc"
+              />
             )}
           </View>
         ))}
@@ -112,11 +107,7 @@ export default function ManualSmsScan({
           lightColor="rgba(34,197,94,0.1)"
           darkColor="rgba(34,197,94,0.15)"
         >
-          <Feather
-            name="check"
-            size={16}
-            color="rgb(34,197,94)"
-          />
+          <Feather name="check" size={16} color="rgb(34,197,94)" />
           <Text
             className="text-sm"
             lightColor="rgb(21,128,61)"
@@ -133,18 +124,16 @@ export default function ManualSmsScan({
         className="
           flex-row items-center gap-3 
           rounded-xl p-3 mb-3
-          border border-red-500/30
+          border
         "
         darkColor="#f5656519"
         lightColor="#f5656519"
+        lightBorderColor="rgb(239 68 68 / 0.3)"
+        darkBorderColor="rgb(239 68 68 / 0.3)"
       >
-        <Feather
-          name="trash-2"
-          size={18}
-          color="rgb(239,68,68)"
-        />
+        <Feather name="trash-2" size={18} color="rgb(239,68,68)" />
 
-        <Text className="font-medium text-red-400">
+        <Text className="font-medium" lightColor="#f87171" darkColor="#f87171">
           Delete all data
         </Text>
       </View>
@@ -155,17 +144,14 @@ export default function ManualSmsScan({
         lightColor="rgb(239,246,255)"
         darkColor="rgba(59,130,246,0.1)"
       >
-        <Feather
-          name="info"
-          size={16}
-          color="rgb(59,130,246)"
-        />
+        <Feather name="info" size={16} color="rgb(59,130,246)" />
         <Text
           className="text-xs flex-1"
           lightColor="rgb(29,78,216)"
           darkColor="rgb(147,197,253)"
         >
-          Use manual scan to import historical transactions. This is useful for testing or one-time imports without enabling auto-scan.
+          Use manual scan to import historical transactions. This is useful for
+          testing or one-time imports without enabling auto-scan.
         </Text>
       </View>
     </ThemedCard>

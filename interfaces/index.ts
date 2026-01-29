@@ -1,3 +1,5 @@
+import { buildRangeAnalytics } from "@/utils/analytics/buildRangeAnalytics";
+
 /*------------------- GLOBAL INTERFACES ------------------*/
 
 export interface Transaction {
@@ -35,11 +37,7 @@ export type MpesaMessageType =
   | "DEPOSIT"
   | "UNKNOWN";
 
-export type SmsScanRange =
-  | "two_weeks"
-  | "month"
-  | "three_months"
-  | "all";
+export type SmsScanRange = "two_weeks" | "month" | "three_months" | "all";
 
 export type IngestResult = {
   insertedTransactions: number;
@@ -53,6 +51,8 @@ export interface RawSms {
 }
 
 /*------------------- CONTEXT TYPES ------------------*/
+export type AnalyticsRange = "monthly" | "yearly" | "allTime";
+
 export type TransactionContextType = {
   transactions: TransactionWithDebt[];
   loading: boolean;
@@ -60,45 +60,44 @@ export type TransactionContextType = {
 };
 
 export interface TransactionWithDebt extends Transaction {
-  debt?: { 
-    debtAmount: number; 
-    interest: number; 
-    outstanding: number; 
-    dueDate: string; 
-  } | null; 
+  debt?: {
+    debtAmount: number;
+    interest: number;
+    outstanding: number;
+    dueDate: string;
+  } | null;
 }
 
 export interface ContactStats {
   name: string;
-  count: number;       // number of transactions
-  totalAmount: number; // total amount sent/received
-  rank: number;        // ranking
+  count: number;
+  totalAmount: number;
+  avgAmount: number;
+  totalSent?: number;
+  totalReceived?: number;
+  rank: number;
 }
 
-export interface AnalyticsData {
-  totalSent: number;
-  totalReceived: number;
-  totalTransactions: number;
-  totalTransactionCost: number;
-  totalContacts: number;
-  mostFrequentContacts: ContactStats[]; // by number of transactions
-  highestSpendingContacts: ContactStats[]; // by total amount spent
-  averageTransactionCost: number;
-  monthlyTransactionCosts: Record<string, number>; // monthKey => total cost
-  monthlyTotals: Record<string, { sent: number; received: number }>; // for each month
-  last6MonthsTotals: { sent: number; received: number };
-  last12MonthsTotals: { sent: number; received: number };
-}
-
-export interface AnalyticsContextType {
-  analytics: AnalyticsData;
-}
+export type AnalyticsContextValue = {
+  range: AnalyticsRange;
+  setRange: (range: AnalyticsRange) => void;
+  analytics: ReturnType<typeof buildRangeAnalytics>;
+  monthlyTransactionCosts: Record<string, number>;
+  monthlyTransactionCounts: Record<string, number>;
+};
 
 /*------------------- COMPONENT PROPS ------------------*/
 export type AutoSmsProps = {
   smsPermission: boolean;
   onToggle: () => void;
 };
+
+export interface GradientActionButtonProps {
+  label: string;
+  onPress?: () => void;
+  disabled?: boolean;
+  className?: string;
+}
 
 type TransactionType = "received" | "sent" | "debt";
 
@@ -124,4 +123,47 @@ export type TransactionListProps = {
   loading?: boolean;
 };
 
+/*------------------- HOME COMPONENT PROPS ------------------*/
+export interface BalanceCardProps {
+  totalReceived: number;
+  totalSent: number;
+}
 
+export interface MetricCardsProps {
+  totalTransactions: number;
+  totalTransactionCost: number;
+  totalContacts: number;
+  rangeLabel: string;
+}
+
+export interface TopContactCardProps {
+  topContact: ContactStats;
+}
+
+export interface RecentActivityProps {
+  transactions: TransactionWithDebt[];
+}
+
+/*------------------- ANALYTICS COMPONENT PROPS ------------------*/
+export interface TransactionCostCardsProps {
+  totalTransactionCost: number;
+  totalTransactions: number;
+  totalDebtCost: number;
+}
+
+export interface AverageTransactionCostCardProps {
+  averageTransactionCost: number;
+}
+
+export interface MonthlyTransactionCostsCardProps {
+  monthlyTransactionCosts: Record<string, number>;
+  monthlyTransactionCounts: Record<string, number>;
+}
+
+export interface MostFrequentContactCardProps {
+  topContact: ContactStats;
+}
+
+export interface HighestSpendingContactsCardProps {
+  contacts: ContactStats[];
+}

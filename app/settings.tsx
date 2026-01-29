@@ -1,10 +1,9 @@
-
-
-import { AboutSection } from "@/components/AboutApp";
-import AppearanceSection from "@/components/AppearanceSection";
-import AutoSmsScan from "@/components/AutoSmsScan";
-import ManualSmsScan from "@/components/ManualSmsScan";
-import SecuritySection from "@/components/SecuritySection";
+import { AboutSection } from "@/components/settings/AboutApp";
+import AppearanceSection from "@/components/settings/AppearanceSection";
+import AutoSmsScan from "@/components/settings/AutoSmsScan";
+import DashboardType from "@/components/settings/DashboardType";
+import ManualSmsScan from "@/components/settings/ManualSmsScan";
+import SecuritySection from "@/components/settings/SecuritySection";
 import { ScrollView, ThemedGradientBackground } from "@/components/Themed";
 import { useTransactions } from "@/context/TransactionContext";
 import { deleteAllData } from "@/data";
@@ -18,10 +17,7 @@ export default function SettingsScreen() {
   const [selectedRange, setSelectedRange] = useState<SmsScanRange>("month");
   const { refresh } = useTransactions();
 
-  const {
-    scanAndSave,
-    loading,
-  } = useSmsScanner();
+  const { scanAndSave, loading } = useSmsScanner();
 
   async function handleManualScan(range: SmsScanRange) {
     setScanComplete(false);
@@ -38,24 +34,25 @@ export default function SettingsScreen() {
   return (
     <ThemedGradientBackground className="flex-1 px-4">
       <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
-      <AppearanceSection />
-      <SecuritySection />
-      <AutoSmsScan         
-        smsPermission={smsPermission}
-        onToggle={() => setSmsPermission((prev) => !prev)}
-      />
-      <ManualSmsScan
-        isScanning={loading}
-        scanComplete={scanComplete}
-        onScan={(range) => {
-          setSelectedRange(range as SmsScanRange);
-          handleManualScan(range as SmsScanRange);
-        }}
-        onDeleteAll={handleDeleteAll}
-      />
+        <AppearanceSection />
+        <DashboardType />
+        <SecuritySection />
+        <AutoSmsScan
+          smsPermission={smsPermission}
+          onToggle={() => setSmsPermission((prev) => !prev)}
+        />
+        <ManualSmsScan
+          isScanning={loading}
+          scanComplete={scanComplete}
+          onScan={(range) => {
+            setSelectedRange(range as SmsScanRange);
+            handleManualScan(range as SmsScanRange);
+          }}
+          onDeleteAll={handleDeleteAll}
+        />
 
-      <AboutSection />
+        <AboutSection />
       </ScrollView>
     </ThemedGradientBackground>
   );
-};
+}

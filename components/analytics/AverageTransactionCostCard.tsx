@@ -1,9 +1,10 @@
 import { Text, ThemedCard, View } from "@/components/Themed";
-import { useAnalytics } from "@/context/AnalyticsContext";
+import { AverageTransactionCostCardProps } from "@/interfaces";
 import { Feather } from "@expo/vector-icons";
 
-export default function AverageTransactionCostCard() {
-  const { averageTransactionCost } = useAnalytics();
+export default function AverageTransactionCostCard({
+  averageTransactionCost,
+}: AverageTransactionCostCardProps) {
   return (
     <ThemedCard className="mb-4">
       <View className="flex-row items-center justify-between">

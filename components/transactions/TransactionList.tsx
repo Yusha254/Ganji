@@ -1,12 +1,14 @@
 import { ScrollView, Text, ThemedCard, View } from "@/components/Themed";
+import TransactionCard from "@/components/transactions/TransactionCard";
 import { Transaction, TransactionListProps } from "@/interfaces";
 import { toISODateTime } from "@/utils/DateUtils";
 import Feather from "@expo/vector-icons/Feather";
 import React, { useEffect, useMemo, useState } from "react";
 import { Pressable } from "react-native";
-import TransactionCard from "./TransactionCard";
 
-export default function TransactionList({ transactions }: TransactionListProps) {
+export default function TransactionList({
+  transactions,
+}: TransactionListProps) {
   const [expandedMonths, setExpandedMonths] = useState<Set<string>>(new Set());
 
   // Group transactions by "Month Year" e.g. "August 2025"
@@ -70,7 +72,9 @@ export default function TransactionList({ transactions }: TransactionListProps) 
   return (
     // Themed ScrollView keeps background transparent and hides scrollbars
     <ScrollView className="flex-1">
-      <View className="px-4 pb-10"> {/* pb-10 ensures last month isn't cut off */}
+      <View className="px-4 pb-10">
+        {" "}
+        {/* pb-10 ensures last month isn't cut off */}
         {sortedMonths.map((monthKey) => {
           const monthTx = grouped[monthKey];
           const isOpen = expandedMonths.has(monthKey);
@@ -97,15 +101,24 @@ export default function TransactionList({ transactions }: TransactionListProps) 
               >
                 <View>
                   <Text className="text-base font-semibold">{monthKey}</Text>
-                  <Text className="text-xs text-gray-400">{monthTx.length} transactions</Text>
+                  <Text className="text-xs text-gray-400">
+                    {monthTx.length} transactions
+                  </Text>
                 </View>
 
                 <View className="flex-row items-center gap-3">
-                  <Text className={`font-semibold ${monthTotal >= 0 ? "text-green-400" : "text-red-400"}`}>
-                    {monthTotal >= 0 ? "+" : "-"}KSh{Math.abs(monthTotal).toFixed(2)}
+                  <Text
+                    className={`font-semibold ${monthTotal >= 0 ? "text-green-400" : "text-red-400"}`}
+                  >
+                    {monthTotal >= 0 ? "+" : "-"}KSh
+                    {Math.abs(monthTotal).toFixed(2)}
                   </Text>
 
-                  <Feather name={isOpen ? "chevron-up" : "chevron-down"} size={20} color="gray" />
+                  <Feather
+                    name={isOpen ? "chevron-up" : "chevron-down"}
+                    size={20}
+                    color="gray"
+                  />
                 </View>
               </Pressable>
 
