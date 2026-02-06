@@ -10,7 +10,7 @@ export default function AverageTransactionCostCard({
       <View className="flex-row items-center justify-between">
         {/* Left */}
         <View>
-          <Text className="text-sm text-gray-400 mb-1">
+          <Text className="text-sm mb-1" lightColor="#6b7280" darkColor="#9ca3af">
             Average Cost per Transaction
           </Text>
 
@@ -20,7 +20,7 @@ export default function AverageTransactionCostCard({
         </View>
 
         {/* Icon */}
-        <View className="p-3 rounded-full bg-purple-400/20">
+        <View className="rounded-full p-3" lightColor="rgba(168, 85, 247, 0.2)" darkColor="rgba(168, 85, 247, 0.2)">
           <Feather name="dollar-sign" size={24} color="rgb(192,132,252)" />
         </View>
       </View>

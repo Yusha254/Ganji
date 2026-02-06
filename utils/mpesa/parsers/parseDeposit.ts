@@ -1,5 +1,5 @@
 import { Transaction } from "@/interfaces";
-import { amountRegex, dateTimeRegex, nameMatchRegexDeposit, transactionCodeRegex } from "../regex";
+import { amountRegex, balanceRegex, dateTimeRegex, nameMatchRegexDeposit, transactionCodeRegex } from "../regex";
 
 export function parseDeposit(message: string): Transaction | null {
   try {
@@ -11,11 +11,14 @@ export function parseDeposit(message: string): Transaction | null {
     if (!codeMatch || !amountMatch || !dateTimeMatch) return null;
 
     const [date, time] = [dateTimeMatch[1], dateTimeMatch[2]];
+    const balanceMatch = message.match(balanceRegex);
+    const balance = balanceMatch ? parseFloat(balanceMatch[1].replace(/,/g, '')) : undefined;
 
     return {
       code: codeMatch[1],
       amount: parseFloat(amountMatch[1].replace(/,/g, '')),
       transactionCost: 0,
+      balance,
       date,
       time,
       isIncome: true,

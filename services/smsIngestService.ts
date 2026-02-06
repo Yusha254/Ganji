@@ -10,12 +10,13 @@ export async function ingestSmsMessages(
   let skipped = 0;
 
   for (const sms of messages) {
-    
+
     const parsed = parseMpesaMessage(sms.body, sms.date);
-    
+
 
     if (!parsed) {
       skipped++;
+      console.log("Failed to parse SMS:", sms.body);
       continue;
     }
 
@@ -27,12 +28,17 @@ export async function ingestSmsMessages(
       }
 
       /* ---- DEBT ---- */
-      if ("transactionCode" in parsed) {
-        await insertDebt(parsed as Debt);
+      // It might be a Debt object OR a Transaction with a 'debt' property
+      const debtData = ("transactionCode" in parsed)
+        ? (parsed as Debt)
+        : (("debt" in parsed) ? (parsed as any).debt : null);
+
+      if (debtData) {
+        await insertDebt(debtData);
         insertedDebt++;
       }
     } catch (err: any) {
-      console.error("Insert failed for SMS:", sms.body);
+      console.log("Insert failed for SMS:", sms.body);
       // duplicate constraint etc
       skipped++;
     }

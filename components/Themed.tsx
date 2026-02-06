@@ -1,7 +1,7 @@
 // Themed.tsx
 
+import { useSettings } from "@/context/SettingsContext";
 import { LinearGradient } from "expo-linear-gradient";
-import { useColorScheme } from "nativewind";
 import {
   ScrollViewProps as DefaultScrollViewProps,
   ScrollView as RNScrollView,
@@ -25,8 +25,11 @@ export type GradientProps = {
   style?: any;
 };
 
-const { colorScheme } = useColorScheme();
-const isDark = colorScheme === "dark";
+function useResolvedTheme() {
+  const { resolvedTheme } = useSettings();
+  return resolvedTheme;
+}
+
 
 /* -----------------------------
    COLOR RESOLUTION
@@ -53,7 +56,7 @@ export function ScrollView({
   darkColor?: string;
   className?: string;
 }) {
-  const theme = colorScheme === "dark" ? "dark" : "light";
+  const theme = useResolvedTheme();
 
   // Background resolves exactly like your Text and View components:
   const backgroundColor =
@@ -80,7 +83,7 @@ export function Text({
   style,
   ...rest
 }: TextProps) {
-  const theme = colorScheme === "dark" ? "dark" : "light";
+  const theme = useResolvedTheme();
 
   // theme default
   const themeColor =
@@ -113,7 +116,7 @@ export function View({
   style,
   ...rest
 }: ViewProps) {
-  const theme = colorScheme === "dark" ? "dark" : "light";
+  const theme = useResolvedTheme();
 
   const defaultBg = "transparent";
   const overrideBg = resolveColor(theme, lightColor, darkColor);
@@ -143,7 +146,7 @@ export function ThemedCard({
   darkColor,
   ...rest
 }: ViewProps) {
-  const theme = colorScheme === "dark" ? "dark" : "light";
+  const theme = useResolvedTheme();
 
   const bg = theme === "dark" ? "rgba(0, 0, 0, 0.2)" : "#ffffff";
 
@@ -163,6 +166,45 @@ export function ThemedCard({
 }
 
 /* --------------------------------------------------
+   THEMED TRACKED CONTACTS GRADIENT
+---------------------------------------------------*/
+export function ThemedTrackedContactsGradient({
+  children,
+  className,
+  style,
+}: GradientProps) {
+  const theme = useResolvedTheme();
+
+  const colors: [string, string] =
+    theme === "dark"
+      ? ["rgba(234, 179, 8, 0.1)", "rgba(249, 115, 22, 0.1)"]
+      : ["rgb(254, 249, 195)", "rgb(255, 237, 213)"];
+
+  const borderColor =
+    theme === "dark"
+      ? "rgba(234, 179, 8, 0.3)"
+      : "rgb(253, 224, 71)";
+
+  return (
+    <LinearGradient
+      colors={colors}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
+      className={`border p-4 ${className ?? ""}`}
+      style={[
+        {
+          borderColor,
+        },
+        style,
+      ]}
+    >
+      {children}
+    </LinearGradient>
+  );
+}
+
+
+/* --------------------------------------------------
    THEMED GRADIENT BACKGROUND
 ---------------------------------------------------*/
 export function ThemedGradientBackground({
@@ -170,9 +212,11 @@ export function ThemedGradientBackground({
   className,
   style,
 }: GradientProps) {
-  const colors: [string, string, string] = isDark
-    ? ["#020617", "#581c87", "#020617"]
-    : ["#faf5ff", "#fce7f3", "#faf5ff"];
+  const theme = useResolvedTheme();
+  const colors: [string, string, string] =
+    theme === "dark"
+      ? ["#020617", "#581c87", "#020617"]
+      : ["#faf5ff", "#fce7f3", "#faf5ff"];
 
   return (
     <LinearGradient
@@ -195,11 +239,12 @@ export function ThemedTopContactGradient({
   className,
   style,
 }: GradientProps) {
-  const colors: [string, string] = isDark
+  const theme = useResolvedTheme();
+  const colors: [string, string] = theme === "dark"
     ? ["rgba(168, 85, 247, 0.2)", "rgba(236, 72, 153, 0.2)"]
     : ["rgb(243, 232, 255)", "rgb(252, 231, 243)"];
 
-  const borderColor = isDark ? "rgba(168, 85, 247, 0.3)" : "rgb(216, 180, 254)";
+  const borderColor = theme === "dark" ? "rgba(168, 85, 247, 0.3)" : "rgb(216, 180, 254)";
 
   return (
     <LinearGradient

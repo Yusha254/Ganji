@@ -13,7 +13,7 @@ import { parseWithdrawal } from "./mpesa/parsers/withdrawal";
 export function parseMpesaMessage(
   message: string,
   smsDate?: number
-): Transaction | Debt | null {
+): Transaction | Debt | (Transaction & { debt: Debt }) | null {
   if (!message) return null;
 
   const normalized = normalizeSms(message);
@@ -30,7 +30,7 @@ export function parseMpesaMessage(
       return parseReversal(normalized);
 
     case "FULIZA_DEBT":
-      return parseFulizaDebt(normalized);
+      return parseFulizaDebt(normalized, smsDate);
 
     case "FULIZA_REPAYMENT":
       return parseFulizaRepayment(normalized, smsDate);

@@ -1,17 +1,20 @@
 import AverageTransactionCostCard from "@/components/analytics/AverageTransactionCostCard";
-import HighestSpendingContactsCard from "@/components/analytics/HighestSpendingContactCard";
+import HighestSpendingContactsCard from "@/components/analytics/HighestSpendingContactsCard";
 import MonthlyTransactionCostsCard from "@/components/analytics/MonthlyTransactionCostsCard";
 import MostFrequentContactsCard from "@/components/analytics/MostFrequentContactCard";
+import TrackedContactsCard from "@/components/analytics/TrackedContacts";
 import TransactionCostsCards from "@/components/analytics/TransactionCostCards";
 import { ScrollView, ThemedGradientBackground } from "@/components/Themed";
 import ScreenLoader from "@/components/ui/ScreenLoader";
 import { useAnalytics } from "@/context/AnalyticsContext";
+import { useSettings } from "@/context/SettingsContext";
 import { useTransactions } from "@/context/TransactionContext";
 
 export default function AnalyticsScreen() {
   const { analytics, monthlyTransactionCosts, monthlyTransactionCounts } =
     useAnalytics();
   const { loading } = useTransactions();
+  const { trackedContacts, toggleTrackedContact } = useSettings();
 
   // Handle loading state
   if (loading) {
@@ -22,8 +25,9 @@ export default function AnalyticsScreen() {
     );
   }
 
-  // Get top contact and highest spending contacts
-  const topContact = analytics.contacts.mostFrequentContacts[0];
+  // Get top 10 contact and highest spending contacts
+  const top10Contacts = analytics.contacts.mostFrequentContacts.slice(0, 10);
+  const allFrequentContacts = analytics.contacts.mostFrequentContacts;
   const topSpendingContacts = analytics.contacts.highestSpendingContacts.slice(
     0,
     5
@@ -48,10 +52,21 @@ export default function AnalyticsScreen() {
           monthlyTransactionCosts={monthlyTransactionCosts}
           monthlyTransactionCounts={monthlyTransactionCounts}
         />
-        {topContact && <MostFrequentContactsCard topContact={topContact} />}
+        {top10Contacts.length > 0 && (
+          <MostFrequentContactsCard
+            contacts={top10Contacts}
+            trackedContacts={trackedContacts}
+            onToggleTrack={toggleTrackedContact}
+          />
+        )}
         {topSpendingContacts.length > 0 && (
           <HighestSpendingContactsCard contacts={topSpendingContacts} />
         )}
+        <TrackedContactsCard
+          contacts={allFrequentContacts}
+          trackedContacts={trackedContacts}
+          onToggleTrack={toggleTrackedContact}
+        />
       </ScrollView>
     </ThemedGradientBackground>
   );

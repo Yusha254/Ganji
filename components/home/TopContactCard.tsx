@@ -28,12 +28,11 @@ export default function TopContactCard({ topContact }: TopContactCardProps) {
 
           {/* RIGHT ICON CIRCLE */}
           <View
-            className="rounded-full p-3"
-            style={{
-              backgroundColor: "rgba(255, 255, 255, 0.1)",
-            }}
+            className="p-3 rounded-full"
+            lightColor="rgba(255, 255, 255, 0.5)"
+            darkColor="rgba(255, 255, 255, 0.1)"
           >
-            <Ionicons name="people" size={22} color="#ffffff" />
+            <Ionicons name="people" size={22} color="rgb(126, 34, 206)" />
           </View>
         </View>
       </ThemedTopContactGradient>

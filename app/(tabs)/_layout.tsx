@@ -1,8 +1,8 @@
+import { useSettings } from "@/context/SettingsContext";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, Tabs } from 'expo-router';
-import { useColorScheme } from 'nativewind';
 import React from 'react';
 import { Pressable, Text } from 'react-native';
 
@@ -63,25 +63,23 @@ function GradientHeaderTitle({ title }: { title: string }) {
   );
 }
 
-
-
 export default function TabLayout() {
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const { resolvedTheme } = useSettings();
+  const isDark = resolvedTheme === 'dark';
 
   return (
     <Tabs
       screenOptions={{
         headerStyle: {
-        backgroundColor: isDark ? '#020617' : '#faf5ff',
-        borderBottomColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgb(233, 213, 255)',
-        borderBottomWidth: 0.5,
-      },
-      tabBarStyle: {
-        backgroundColor: isDark ? '#020617' : '#faf5ff',
-        borderTopColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgb(233, 213, 255)',
-        borderTopWidth: 0.5,
-      },
+          backgroundColor: isDark ? '#020617' : '#faf5ff',
+          borderBottomColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgb(233, 213, 255)',
+          borderBottomWidth: 0.5,
+        },
+        tabBarStyle: {
+          backgroundColor: isDark ? '#020617' : '#faf5ff',
+          borderTopColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgb(233, 213, 255)',
+          borderTopWidth: 0.5,
+        },
 
         tabBarActiveTintColor: isDark ? '#f9a8d4' : '#a855f7',
         tabBarInactiveTintColor: isDark ? '#d1d5db' : '#374151',

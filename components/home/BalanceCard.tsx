@@ -3,7 +3,7 @@ import { BalanceCardProps } from "@/interfaces";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 
-export default function BalanceCard({ totalReceived, totalSent }: BalanceCardProps) {
+export default function BalanceCard({ balance, totalReceived, totalSent }: BalanceCardProps) {
   return (
     <View className="mx-4 my-4 rounded-2xl overflow-hidden">
       <LinearGradient
@@ -22,10 +22,14 @@ export default function BalanceCard({ totalReceived, totalSent }: BalanceCardPro
 
         <Text
           className="text-4xl font-bold mt-1"
-          lightColor="#FFFFFFCC"
-          darkColor="#FFFFFFCC"
+          lightColor="#FFFFFF"
+          darkColor="#FFFFFF"
         >
-          $ -1490.67
+          KSh{" "}
+          {balance.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
         </Text>
 
         <View className="flex-row mt-5 w-full justify-between">
@@ -36,8 +40,8 @@ export default function BalanceCard({ totalReceived, totalSent }: BalanceCardPro
           >
             <Text
               className="text-sm"
-              lightColor="#FFFFFFCC"
-              darkColor="#FFFFFFCC"
+              lightColor="rgb(134, 239, 172)"
+              darkColor="rgb(134, 239, 172)"
             >
               Received
             </Text>
@@ -61,8 +65,8 @@ export default function BalanceCard({ totalReceived, totalSent }: BalanceCardPro
           >
             <Text
               className="text-sm"
-              lightColor="#FFFFFFCC"
-              darkColor="#FFFFFFCC"
+              lightColor="rgb(252, 165, 165)"
+              darkColor="rgb(252, 165, 165)"
             >
               Sent
             </Text>

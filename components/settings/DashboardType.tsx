@@ -2,16 +2,14 @@
 
 import { Text, ThemedCard, View } from "@/components/Themed";
 import GradientActionButton from "@/components/ui/GradientActionButton";
+import { useSettings } from "@/context/SettingsContext";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
-import React, { useState } from "react";
+import React from "react";
 import { Pressable } from "react-native";
 
 export default function DashboardType() {
-  // STATIC STATE FOR NOW
-  const [dashboardFilter, setDashboardFilter] = useState<
-    "monthly" | "yearly" | "alltime"
-  >("monthly");
+  const { dashboardType, setDashboardType } = useSettings();
 
   return (
     <View className="mb-8">
@@ -36,15 +34,15 @@ export default function DashboardType() {
 
         {/* Buttons */}
         <View className="flex-row gap-2 mb-4">
-          {dashboardFilter === "monthly" ? (
+          {dashboardType === "monthly" ? (
             <GradientActionButton
               label="Monthly"
-              onPress={() => setDashboardFilter("monthly")}
+              onPress={() => setDashboardType("monthly")}
             />
           ) : (
             <Pressable
               className="flex-1"
-              onPress={() => setDashboardFilter("monthly")}
+              onPress={() => setDashboardType("monthly")}
             >
               <View
                 className="px-4 py-3 rounded-lg items-center"
@@ -55,15 +53,15 @@ export default function DashboardType() {
               </View>
             </Pressable>
           )}
-          {dashboardFilter === "yearly" ? (
+          {dashboardType === "yearly" ? (
             <GradientActionButton
               label="Yearly"
-              onPress={() => setDashboardFilter("yearly")}
+              onPress={() => setDashboardType("yearly")}
             />
           ) : (
             <Pressable
               className="flex-1"
-              onPress={() => setDashboardFilter("yearly")}
+              onPress={() => setDashboardType("yearly")}
             >
               <View
                 className="px-4 py-3 rounded-lg items-center"
@@ -74,15 +72,15 @@ export default function DashboardType() {
               </View>
             </Pressable>
           )}
-          {dashboardFilter === "alltime" ? (
+          {dashboardType === "alltime" ? (
             <GradientActionButton
               label="All Time"
-              onPress={() => setDashboardFilter("alltime")}
+              onPress={() => setDashboardType("alltime")}
             />
           ) : (
             <Pressable
               className="flex-1"
-              onPress={() => setDashboardFilter("alltime")}
+              onPress={() => setDashboardType("alltime")}
             >
               <View
                 className="px-4 py-3 rounded-lg items-center"
@@ -107,11 +105,11 @@ export default function DashboardType() {
             lightColor="rgb(29,78,216)"
             darkColor="rgb(147,197,253)"
           >
-            {dashboardFilter === "monthly" &&
+            {dashboardType === "monthly" &&
               "Your dashboard will show transactions from the current month."}
-            {dashboardFilter === "yearly" &&
+            {dashboardType === "yearly" &&
               "Your dashboard will show transactions from the current year."}
-            {dashboardFilter === "alltime" &&
+            {dashboardType === "alltime" &&
               "Your dashboard will show all transactions from all time periods."}
           </Text>
         </View>

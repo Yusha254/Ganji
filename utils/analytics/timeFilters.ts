@@ -1,5 +1,5 @@
 import { Transaction } from "@/interfaces";
-import { isAfter } from "@/utils/DateUtils";
+import { isAfter, toISODateTime } from "@/utils/DateUtils";
 
 const DAYS = {
   monthly: 30,
@@ -14,7 +14,12 @@ export const filterTransactionsByRange = (
   since.setDate(since.getDate() - DAYS[range]);
 
   return transactions.filter((tx) => {
-    const date = new Date(`${tx.date}T${tx.time ?? "00:00:00"}`);
+    // tx.date is DD/MM/YYYY or YYYY-MM-DD
+    // tx.time is HH:MM AM/PM or HH:MM:SS
+    // toISODateTime handles both formats and returns ISO string
+    const isoString = toISODateTime(tx.date, tx.time);
+    const date = new Date(isoString);
+
     return isAfter(date, since);
   });
 };

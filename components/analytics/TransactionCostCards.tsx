@@ -21,7 +21,7 @@ export default function TransactionCostsCards({
         {/* Total Fees */}
         <View
           className="rounded-2xl overflow-hidden border flex-1"
-          lightBorderColor="#d8b4fe66"
+          lightBorderColor="rgb(126, 34, 206)"
           darkBorderColor="#d8b4fe66"
         >
           <LinearGradient
@@ -30,7 +30,7 @@ export default function TransactionCostsCards({
           >
             <Text
               className="text-sm mb-1"
-              lightColor="#d8b4fe"
+              lightColor="rgb(126, 34, 206)"
               darkColor="#d8b4fe"
             >
               Total Fees Paid
@@ -44,7 +44,7 @@ export default function TransactionCostsCards({
               })}
             </Text>
 
-            <Text className="text-xs" lightColor="#9ca3af" darkColor="#9ca3af">
+            <Text className="text-xs" lightColor="#576f97ff" darkColor="#9ca3af">
               Across {totalTransactions} transaction
               {totalTransactions !== 1 ? "s" : ""}
             </Text>
@@ -54,7 +54,7 @@ export default function TransactionCostsCards({
         {/* Debt Costs Placeholder */}
         <View
           className="rounded-2xl overflow-hidden border flex-1"
-          lightBorderColor="#fdba7466"
+          lightBorderColor="#fdbb74ff"
           darkBorderColor="#fdba7466"
         >
           <LinearGradient
@@ -63,7 +63,7 @@ export default function TransactionCostsCards({
           >
             <Text
               className="text-sm mb-1"
-              lightColor="#fdba74"
+              lightColor="#f79429ff"
               darkColor="#fdba74"
             >
               Debt Costs
@@ -77,7 +77,7 @@ export default function TransactionCostsCards({
               })}
             </Text>
 
-            <Text className="text-xs" lightColor="#9ca3af" darkColor="#9ca3af">
+            <Text className="text-xs" lightColor="#576f97ff" darkColor="#9ca3af">
               Additional fees
             </Text>
           </LinearGradient>

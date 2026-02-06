@@ -1,5 +1,7 @@
+import { toISODateTime } from "@/utils/DateUtils";
+
 export function formatTimeLabel(date: string, time: string) {
-  const txDate = new Date(`${date}T${time}`);
+  const txDate = new Date(toISODateTime(date, time));
   const now = new Date();
 
   const isToday = txDate.toDateString() === now.toDateString();

@@ -72,6 +72,8 @@ export default function ManualSmsScan({
             className="flex-row items-center gap-3 rounded-xl p-3 border"
             lightColor="#ffffff"
             darkColor="rgba(255,255,255,0.05)"
+            lightBorderColor="rgb(233, 213, 255)"
+            darkBorderColor="rgba(255, 255, 255, 0.2)"
             style={{
               opacity: isScanning ? 0.6 : 1,
             }}

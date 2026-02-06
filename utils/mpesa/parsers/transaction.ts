@@ -2,7 +2,7 @@ import { Transaction } from "@/interfaces";
 import { convertToISO } from "../../DateUtils";
 import { formatName } from "../../StringUtils";
 import { parseNumber } from "../helpers";
-import { amountRegex, costRegex, dateTimeRegex, isIncomeRegex, nameMatchRegexExpense, nameMatchRegexIncome, transactionCodeRegex } from "../regex";
+import { amountRegex, balanceRegex, costRegex, dateTimeRegex, isIncomeRegex, nameMatchRegexExpense, nameMatchRegexIncome, transactionCodeRegex } from "../regex";
 
 export function parseTransaction(message: string): Transaction | null {
   const code = message.match(transactionCodeRegex)?.[1];
@@ -25,10 +25,14 @@ export function parseTransaction(message: string): Transaction | null {
     ? formatName(nameMatch[2] || nameMatch[1])
     : undefined;
 
+  const balanceMatch = message.match(balanceRegex);
+  const balance = balanceMatch ? parseNumber(balanceMatch[1]) : undefined;
+
   return {
     code: code,
     amount: amount,
     transactionCost: transactionCost,
+    balance: balance,
     date: date,
     time: time,
 

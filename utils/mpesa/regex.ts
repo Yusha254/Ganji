@@ -16,6 +16,7 @@ export const interestRegex = /Access Fee charged Ksh\s?([\d.]+)/i;
 export const outstandingRegex = /Outstanding balance is Ksh\s?([\d.]+)/i;
 export const dueDateRegex = /to be repaid by\s+(.+?)\./i;
 export const isIncomeRegex = /you have received/i;
+export const balanceRegex = /balance is Ksh([\d,]+\.\d{2})/i;
 
 export const nameMatchRegexIncome = /from\s+(.+?)(?=\s\d{10}| on)/i;
 export const nameMatchRegexExpense = /(sent to|paid to)\s+(.+?)(?=\s\d{10}| on|\.)/i;

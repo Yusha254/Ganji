@@ -6,6 +6,7 @@ export interface Transaction {
   code: string;
   amount: number;
   transactionCost: number;
+  balance?: number; // Added balance
   date: string;
   time: string;
 
@@ -14,6 +15,7 @@ export interface Transaction {
   isReversal: boolean;
   isWithdrawal: boolean;
   isDeposit: boolean;
+  isTransfer?: boolean;
 
   name?: string;
 }
@@ -84,13 +86,46 @@ export type AnalyticsContextValue = {
   analytics: ReturnType<typeof buildRangeAnalytics>;
   monthlyTransactionCosts: Record<string, number>;
   monthlyTransactionCounts: Record<string, number>;
+  headBalance: number; // Added headBalance
 };
+
+/*------------------- SETTINGS TYPES ------------------*/
+export type AppearanceMode = "light" | "dark" | "system";
+export type DashboardType = "monthly" | "yearly" | "alltime";
+
+export interface SettingsContextValue {
+  // Values
+  appearance: AppearanceMode;
+  resolvedTheme: "light" | "dark";
+  autoScan: boolean;
+  dashboardType: DashboardType;
+  pin: string | null;
+  isAuthorized: boolean; // Added isAuthorized
+  lastSmsSync: number;
+  isLoading: boolean;
+  trackedContacts: string[];
+
+  // Setters
+  setAppearance: (mode: AppearanceMode) => Promise<void>;
+  toggleAutoScan: () => Promise<void>;
+  setDashboardType: (type: DashboardType) => Promise<void>;
+  setPin: (pin: string) => Promise<void>;
+  clearPin: () => Promise<void>;
+  updateLastSmsSync: (ts: number) => Promise<void>;
+  setIsAuthorized: (auth: boolean) => void; // Added setIsAuthorized
+  toggleTrackedContact: (name: string) => Promise<void>;
+}
 
 /*------------------- COMPONENT PROPS ------------------*/
 export type AutoSmsProps = {
   smsPermission: boolean;
   onToggle: () => void;
 };
+
+export interface PinEntryScreenProps {
+  storedPin: string;
+  onSuccess: () => void;
+}
 
 export interface GradientActionButtonProps {
   label: string;
@@ -125,6 +160,7 @@ export type TransactionListProps = {
 
 /*------------------- HOME COMPONENT PROPS ------------------*/
 export interface BalanceCardProps {
+  balance: number; // Added balance
   totalReceived: number;
   totalSent: number;
 }
@@ -161,9 +197,17 @@ export interface MonthlyTransactionCostsCardProps {
 }
 
 export interface MostFrequentContactCardProps {
-  topContact: ContactStats;
+  contacts: ContactStats[];
+  trackedContacts: string[];
+  onToggleTrack: (name: string) => void;
 }
 
 export interface HighestSpendingContactsCardProps {
   contacts: ContactStats[];
+}
+
+export interface TrackedContactsCardProps {
+  contacts: ContactStats[];
+  trackedContacts: string[];
+  onToggleTrack: (name: string) => void;
 }

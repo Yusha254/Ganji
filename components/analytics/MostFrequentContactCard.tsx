@@ -4,13 +4,10 @@ import { FontAwesome } from "@expo/vector-icons";
 import { Pressable } from "react-native";
 
 export default function MostFrequentContactsCard({
-  topContact,
+  contacts,
+  trackedContacts,
+  onToggleTrack,
 }: MostFrequentContactCardProps) {
-  const avgFee = topContact.count > 0 ? topContact.totalAmount / topContact.count : 0;
-  const totalSent = topContact.totalSent ?? 0;
-  const totalReceived = topContact.totalReceived ?? 0;
-  const netAmount = totalReceived - totalSent;
-
   return (
     <View className="mb-6">
       {/* Section Title */}
@@ -19,64 +16,128 @@ export default function MostFrequentContactsCard({
         <Text className="text-lg font-semibold">Most Frequent Contacts</Text>
       </View>
 
-      {/* Top Contact Card */}
-      <ThemedCard className="mb-2">
-        {/* Top Row */}
-        <View className="flex-row justify-between mb-2">
-          <View className="flex-row items-center gap-3 flex-1">
-            <View className="w-8 h-8 rounded-full bg-purple-400/20 items-center justify-center">
-              <Text className="text-sm text-purple-300">#{topContact.rank}</Text>
-            </View>
+      {/* List of Contacts */}
+      {contacts.map((contact) => {
+        const avgFee = contact.count > 0 ? contact.totalAmount / contact.count : 0;
+        const totalSent = contact.totalSent ?? 0;
+        const totalReceived = contact.totalReceived ?? 0;
+        const netAmount = totalReceived - totalSent;
+        const isTracked = trackedContacts.includes(contact.name);
 
-            <View className="flex-1">
-              <View className="flex-row items-center gap-2">
-                <Text className="font-medium" numberOfLines={1}>
-                  {topContact.name}
-                </Text>
-                <FontAwesome name="star" size={16} color="rgb(234,179,8)" />
+        return (
+          <ThemedCard key={contact.name} className="mb-4">
+            {/* Top Row */}
+            <View className="flex-row justify-between mb-2">
+              <View className="flex-row items-center gap-3 flex-1">
+                <View
+                  className="w-8 h-8 rounded-full items-center justify-center"
+                  lightColor="rgba(192, 132, 252, 0.2)"
+                  darkColor="rgba(192, 132, 252, 0.2)"
+                >
+                  <Text
+                    className="text-sm"
+                    lightColor="rgb(216, 180, 254)"
+                    darkColor="rgb(216, 180, 254)"
+                  >
+                    #{contact.rank}
+                  </Text>
+                </View>
+
+                <View className="flex-1">
+                  <View className="flex-row items-center gap-2">
+                    <Text className="font-medium" numberOfLines={1}>
+                      {contact.name}
+                    </Text>
+                    {isTracked && (
+                      <FontAwesome name="star" size={16} color="rgb(234,179,8)" />
+                    )}
+                  </View>
+                  <Text
+                    className="text-sm"
+                    lightColor="rgb(163, 163, 163)"
+                    darkColor="rgb(163, 163, 163)"
+                  >
+                    {contact.count} transaction{contact.count !== 1 ? "s" : ""}
+                  </Text>
+                </View>
               </View>
-              <Text className="text-sm text-gray-400">
-                {topContact.count} transaction{topContact.count !== 1 ? "s" : ""}
-              </Text>
+
+              <Pressable
+                className="p-2 rounded-lg"
+                onPress={() => onToggleTrack(contact.name)}
+              >
+                <FontAwesome
+                  name={isTracked ? "star" : "star-o"}
+                  size={20}
+                  color={isTracked ? "rgb(234,179,8)" : "rgb(163,163,163)"}
+                />
+              </Pressable>
             </View>
-          </View>
 
-          <Pressable className="p-2 rounded-lg">
-            <FontAwesome name="star" size={20} color="rgb(234,179,8)" />
-          </Pressable>
-        </View>
+            {/* Stats Grid */}
+            <View className="flex-row flex-wrap gap-3">
+              <View className="w-[48%]">
+                <Text
+                  className="text-xs"
+                  lightColor="rgb(163, 163, 163)"
+                  darkColor="rgb(163, 163, 163)"
+                >
+                  Total Spent
+                </Text>
+                <Text lightColor="rgb(248, 113, 113)" darkColor="rgb(248, 113, 113)">
+                  KSh {totalSent.toLocaleString()}
+                </Text>
+              </View>
 
-        {/* Stats Grid */}
-        <View className="flex-row flex-wrap gap-3">
-          <View className="w-[48%]">
-            <Text className="text-xs text-gray-400">Total Spent</Text>
-            <Text className="text-red-400">
-              KSh {totalSent.toLocaleString()}
-            </Text>
-          </View>
+              <View className="w-[48%]">
+                <Text
+                  className="text-xs"
+                  lightColor="rgb(163, 163, 163)"
+                  darkColor="rgb(163, 163, 163)"
+                >
+                  Total Received
+                </Text>
+                <Text lightColor="rgb(74, 222, 128)" darkColor="rgb(74, 222, 128)">
+                  KSh {totalReceived.toLocaleString()}
+                </Text>
+              </View>
 
-          <View className="w-[48%]">
-            <Text className="text-xs text-gray-400">Total Received</Text>
-            <Text className="text-green-400">
-              KSh {totalReceived.toLocaleString()}
-            </Text>
-          </View>
+              <View className="w-[48%]">
+                <Text
+                  className="text-xs"
+                  lightColor="rgb(163, 163, 163)"
+                  darkColor="rgb(163, 163, 163)"
+                >
+                  Net Amount
+                </Text>
+                <Text
+                  lightColor={
+                    netAmount >= 0 ? "rgb(74, 222, 128)" : "rgb(248, 113, 113)"
+                  }
+                  darkColor={
+                    netAmount >= 0 ? "rgb(74, 222, 128)" : "rgb(248, 113, 113)"
+                  }
+                >
+                  KSh {netAmount.toLocaleString()}
+                </Text>
+              </View>
 
-          <View className="w-[48%]">
-            <Text className="text-xs text-gray-400">Net Amount</Text>
-            <Text
-              className={netAmount >= 0 ? "text-green-400" : "text-red-400"}
-            >
-              KSh {netAmount.toLocaleString()}
-            </Text>
-          </View>
-
-          <View className="w-[48%]">
-            <Text className="text-xs text-gray-400">Avg Fee</Text>
-            <Text className="text-purple-300">KSh {avgFee.toFixed(2)}</Text>
-          </View>
-        </View>
-      </ThemedCard>
+              <View className="w-[48%]">
+                <Text
+                  className="text-xs"
+                  lightColor="rgb(163, 163, 163)"
+                  darkColor="rgb(163, 163, 163)"
+                >
+                  Avg Fee
+                </Text>
+                <Text lightColor="rgb(216, 180, 254)" darkColor="rgb(216, 180, 254)">
+                  KSh {avgFee.toFixed(2)}
+                </Text>
+              </View>
+            </View>
+          </ThemedCard>
+        );
+      })}
     </View>
   );
 }

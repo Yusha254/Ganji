@@ -9,12 +9,12 @@ export default function ScreenLoader({
   label?: string;
 }) {
   return (
-    <View className="flex-1 items-center justify-center px-6">
+    <View className="flex-1 items-center justify-center px-6 rounded-2xl overflow-hidden">
       <LinearGradient
         colors={["rgb(168, 85, 247)", "rgb(236, 72, 153)"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        className="w-14 h-14 rounded-2xl items-center justify-center mb-4"
+        className="w-14 h-14 items-center justify-center mb-4"
       >
         <ActivityIndicator color="#fff" />
       </LinearGradient>

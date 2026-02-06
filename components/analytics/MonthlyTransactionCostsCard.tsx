@@ -15,10 +15,10 @@ export default function MonthlyTransactionCostsCard({
   if (months.length === 0) {
     return (
       <ThemedCard className="mb-4">
-        <Text className="text-sm" lightColor="#9ca3af" darkColor="#9ca3af">
+        <Text className="text-sm" lightColor="#6b7280" darkColor="#9ca3af">
           Monthly Transaction Costs
         </Text>
-        <Text className="mt-3 text-sm" lightColor="#6b7280" darkColor="#6b7280">
+        <Text className="mt-3 text-sm" lightColor="#6b7280" darkColor="#9ca3af">
           No data available
         </Text>
       </ThemedCard>
@@ -28,7 +28,7 @@ export default function MonthlyTransactionCostsCard({
   return (
     <ThemedCard className="mb-4">
       {/* Title */}
-      <Text className="text-sm" lightColor="#9ca3af" darkColor="#9ca3af">
+      <Text className="text-sm" lightColor="#6b7280" darkColor="#9ca3af">
         Monthly Transaction Costs
       </Text>
 
@@ -45,7 +45,7 @@ export default function MonthlyTransactionCostsCard({
             >
               <Text
                 className="text-sm"
-                lightColor="#d1d5db"
+                lightColor="#4b5563"
                 darkColor="#d1d5db"
               >
                 {formatMonth(monthKey)}

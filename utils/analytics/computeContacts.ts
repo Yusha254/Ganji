@@ -29,7 +29,7 @@ export function computeContacts(transactions: Transaction[]) {
 
     if (tx.isIncome) {
       contactMap[key].totalReceived += tx.amount;
-    } else {
+    } else if (!tx.isTransfer) {
       contactMap[key].totalSent += tx.amount;
     }
   });
@@ -52,8 +52,13 @@ export function computeContacts(transactions: Transaction[]) {
     .sort((a, b) => b.count - a.count)
     .map((c, i) => ({ ...c, rank: i + 1 }));
 
-  // Sort and rank for highest spending contacts
+  // Sort and rank for highest spending contacts (Expense Only)
   const highestSpendingContacts = [...contacts]
+    .map((c) => ({
+      ...c,
+      totalAmount: c.totalSent ?? 0, // Override for display
+    }))
+    .filter((c) => c.totalAmount > 0)
     .sort((a, b) => b.totalAmount - a.totalAmount)
     .map((c, i) => ({ ...c, rank: i + 1 }));
 

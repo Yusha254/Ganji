@@ -5,6 +5,7 @@ import DashboardType from "@/components/settings/DashboardType";
 import ManualSmsScan from "@/components/settings/ManualSmsScan";
 import SecuritySection from "@/components/settings/SecuritySection";
 import { ScrollView, ThemedGradientBackground } from "@/components/Themed";
+import { useSettings } from "@/context/SettingsContext";
 import { useTransactions } from "@/context/TransactionContext";
 import { deleteAllData } from "@/data";
 import { useSmsScanner } from "@/hooks/useSmsScanner";
@@ -12,7 +13,7 @@ import { SmsScanRange } from "@/interfaces";
 import { useState } from "react";
 
 export default function SettingsScreen() {
-  const [smsPermission, setSmsPermission] = useState(false);
+  const { autoScan, toggleAutoScan } = useSettings();
   const [scanComplete, setScanComplete] = useState(false);
   const [selectedRange, setSelectedRange] = useState<SmsScanRange>("month");
   const { refresh } = useTransactions();
@@ -38,8 +39,8 @@ export default function SettingsScreen() {
         <DashboardType />
         <SecuritySection />
         <AutoSmsScan
-          smsPermission={smsPermission}
-          onToggle={() => setSmsPermission((prev) => !prev)}
+          smsPermission={autoScan}
+          onToggle={toggleAutoScan}
         />
         <ManualSmsScan
           isScanning={loading}

@@ -1,10 +1,30 @@
 import { Text, ThemedCard, View } from "@/components/Themed";
 import GradientActionButton from "@/components/ui/GradientActionButton";
+import { useSettings } from "@/context/SettingsContext";
 import { Feather } from "@expo/vector-icons";
+import { useState } from "react";
+import { Pressable, TextInput } from "react-native";
 
 export default function SecuritySection() {
-  // STATIC STATE FOR NOW
-  const lockPin = false;
+  const { pin, setPin, clearPin } = useSettings();
+  const [isSettingPin, setIsSettingPin] = useState(false);
+  const [pinInput, setPinInput] = useState("");
+
+  const lockPin = !!pin;
+  const canConfirm = pinInput.length === 4;
+
+  const handleConfirmPin = async () => {
+    if (canConfirm) {
+      await setPin(pinInput);
+      setIsSettingPin(false);
+      setPinInput("");
+    }
+  };
+
+  const handleRemovePin = async () => {
+    await clearPin();
+    setPinInput("");
+  };
 
   return (
     <View className="mb-8">
@@ -48,20 +68,71 @@ export default function SecuritySection() {
             </View>
           </View>
 
-          {/* Action Button (static) */}
-          {lockPin ? (
-            <View className="px-4 py-2 rounded-lg border border-fuchsia-950">
-              <Text className="text-sm">Remove</Text>
-            </View>
-          ) : (
+          {/* Action */}
+          {!lockPin && !isSettingPin && (
             <GradientActionButton
               label="Set PIN"
-              onPress={() => {
-                // TODO: open PIN setup flow
-              }}
+              onPress={() => setIsSettingPin(true)}
             />
           )}
+
+          {lockPin && (
+            <Pressable
+              onPress={handleRemovePin}
+              className="px-4 py-2 rounded-lg"
+            >
+              <Text className="text-sm" lightColor="rgb(239, 68, 68)" darkColor="rgb(239, 68, 68)">Remove</Text>
+            </Pressable>
+          )}
         </View>
+
+        {/* PIN Setup */}
+        {isSettingPin && (
+          <View className="mb-4">
+            <View
+              className="rounded-xl px-4 py-3 mb-3"
+              lightColor="rgb(249,250,251)"
+              darkColor="rgba(255,255,255,0.05)"
+            >
+              <TextInput
+                value={pinInput}
+                onChangeText={(val) =>
+                  setPinInput(val.replace(/\D/g, "").slice(0, 4))
+                }
+                keyboardType="number-pad"
+                secureTextEntry
+                maxLength={4}
+                autoFocus
+                placeholder="••••"
+                placeholderTextColor="#9ca3af"
+                style={{
+                  fontSize: 18,
+                  letterSpacing: 8,
+                  textAlign: "center",
+                  color: "#a855f7",
+                }}
+              />
+            </View>
+
+            <View className="flex-row gap-3">
+              <GradientActionButton
+                label="Confirm"
+                disabled={!canConfirm}
+                onPress={handleConfirmPin}
+              />
+
+              <Pressable
+                onPress={() => {
+                  setIsSettingPin(false);
+                  setPinInput("");
+                }}
+                className="px-4 py-3 rounded-lg justify-center"
+              >
+                <Text className="text-sm opacity-70">Cancel</Text>
+              </Pressable>
+            </View>
+          </View>
+        )}
 
         {/* PIN Status */}
         {lockPin && (

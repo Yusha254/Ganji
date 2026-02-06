@@ -18,6 +18,7 @@ export async function initDatabase() {
 
       amount REAL NOT NULL,
       transactionCost REAL NOT NULL,
+      balance REAL, -- Added balance column
 
       date TEXT NOT NULL,
       time TEXT NOT NULL,
@@ -60,6 +61,14 @@ export async function initDatabase() {
       value TEXT NOT NULL
     );
   `);
+
+  // MIGRATION: Add balance column if it doesn't exist
+  try {
+    await db.execAsync(`ALTER TABLE transactions ADD COLUMN balance REAL;`);
+  } catch (e) {
+    // Column likely already exists
+    console.log("Migration (balance): Column already exists or failed", e);
+  }
 }
 
 export function getDb() {
@@ -83,6 +92,7 @@ export async function insertTransaction(tx: Transaction) {
         code,
         amount,
         transactionCost,
+        balance,
         date,
         time,
         isIncome,
@@ -90,12 +100,13 @@ export async function insertTransaction(tx: Transaction) {
         isWithdrawal,
         isDeposit,
         name
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       `,
       [
         tx.code,
         tx.amount,
         tx.transactionCost,
+        tx.balance ?? null,
         tx.date,
         tx.time,
 

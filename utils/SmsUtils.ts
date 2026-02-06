@@ -40,7 +40,8 @@ function getMinDate(range: SmsScanRange): number | undefined {
 }
 
 export async function scanMpesaMessages(
-  range: SmsScanRange
+  range: SmsScanRange,
+  customMinDate?: number
 ): Promise<RawSms[]> {
   if (Platform.OS !== "android") return [];
 
@@ -50,7 +51,7 @@ export async function scanMpesaMessages(
     return [];
   }
 
-  const minDate = getMinDate(range);
+  const minDate = customMinDate ?? getMinDate(range);
 
   return new Promise((resolve, reject) => {
     SmsAndroid.list(
@@ -58,7 +59,6 @@ export async function scanMpesaMessages(
         box: "inbox",
         address: "MPESA",
         ...(minDate ? { minDate } : {}),
-        
       }),
       (fail) => {
         console.error("❌ SMS scan failed:", fail);
