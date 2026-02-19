@@ -12,7 +12,7 @@ import { router } from "expo-router";
 import { useMemo } from "react";
 import { Pressable } from "react-native";
 
-export default function TabOneScreen() {
+export default function HomeScreen() {
   const { analytics, range, headBalance } = useAnalytics();
   const { transactions, loading } = useTransactions();
 

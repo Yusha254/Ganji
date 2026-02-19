@@ -1,6 +1,6 @@
 import * as SQLite from 'expo-sqlite';
 import { SQLiteDatabase } from 'expo-sqlite';
-import { Debt, Transaction } from '../interfaces';
+import { Debt, Transaction, TransactionWithDebt } from '../interfaces';
 
 /* ---------------- DATABASE INITIALIZATION ---------------- */
 
@@ -52,6 +52,9 @@ export async function initDatabase() {
     CREATE INDEX IF NOT EXISTS idx_transactions_code
       ON transactions(code);
 
+    CREATE INDEX IF NOT EXISTS idx_transactions_date
+      ON transactions(date);
+
     CREATE INDEX IF NOT EXISTS idx_debts_code
       ON debts(transactionCode);
 
@@ -76,6 +79,71 @@ export function getDb() {
     throw new Error('Database not initialized');
   }
   return db;
+}
+
+/* ---------------- QUERY FUNCTIONS (For Pagination) ---------------- */
+
+export interface AvailableMonth {
+  monthKey: string; // YYYY-MM
+  label: string;    // August 2025
+  count: number;
+}
+
+export async function getAvailableMonths(): Promise<AvailableMonth[]> {
+  const db = getDb();
+  // We extract YYYY-MM from the date string.
+  // Assuming date is stored as YYYY-MM-DD or similar.
+  // Actually, looking at DateUtils, it converts to YYYY-MM-DD.
+  const rows = await db.getAllAsync<{ monthKey: string; count: number }>(
+    `SELECT
+      strftime('%Y-%m', date) as monthKey,
+      COUNT(*) as count
+     FROM transactions
+     GROUP BY monthKey
+     ORDER BY monthKey DESC`
+  );
+
+  return rows.map(row => {
+    const [year, month] = row.monthKey.split('-');
+    const date = new Date(parseInt(year), parseInt(month) - 1);
+    const label = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+    return {
+      monthKey: row.monthKey,
+      label,
+      count: row.count
+    };
+  });
+}
+
+export async function getTransactionsPaginated(
+  monthKey: string,
+  limit: number,
+  offset: number
+): Promise<TransactionWithDebt[]> {
+  const db = getDb();
+
+  const transactions = await db.getAllAsync<Transaction>(
+    `SELECT * FROM transactions
+     WHERE strftime('%Y-%m', date) = ?
+     ORDER BY date DESC, time DESC
+     LIMIT ? OFFSET ?`,
+    [monthKey, limit, offset]
+  );
+
+  if (transactions.length === 0) return [];
+
+  // Fetch relevant debts for these transactions
+  const codes = transactions.map(tx => `'${tx.code}'`).join(',');
+  const debts = await db.getAllAsync<Debt>(
+    `SELECT * FROM debts WHERE transactionCode IN (${codes})`
+  );
+
+  const debtMap = new Map(debts.map(d => [d.transactionCode, d]));
+
+  return transactions.map(tx => ({
+    ...tx,
+    debt: debtMap.get(tx.code),
+  }));
 }
 
 /* ---------------- INSERT FUNCTIONS ---------------- */

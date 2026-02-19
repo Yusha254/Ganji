@@ -2,51 +2,54 @@ import { ThemedGradientBackground, View } from "@/components/Themed";
 import FilterTabs from "@/components/transactions/FilterTabs";
 import TransactionList from "@/components/transactions/TransactionList";
 import ScreenLoader from "@/components/ui/ScreenLoader";
-import { useTransactions } from "@/context/TransactionContext";
-import { useEffect, useMemo, useState } from "react";
+import { useAvailableMonths, useInfiniteTransactions } from "@/hooks/useTransactionsQuery";
+import { useMemo, useState } from "react";
 
 export default function TransactionsScreen() {
-  const { transactions, loading } = useTransactions();
-  const [showLoader, setShowLoader] = useState(false);
-  const [activeFilter, setActiveFilter] = useState<
-    "all" | "received" | "sent" | "debt"
-  >("all");
+  const { data: monthsData, isLoading: isLoadingMonths } = useAvailableMonths();
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: isLoadingTx,
+    isError,
+  } = useInfiniteTransactions() as any;
 
-  useEffect(() => {
-    if (!loading) {
-      setShowLoader(false);
-      return;
+  const [activeFilter, setActiveFilter] = useState<"all" | "received" | "sent" | "debt">("all");
+
+  // Flatten transactions and counts for filtering
+  const { filteredTransactions, counts } = useMemo(() => {
+    const allTx = data?.pages.flatMap((page: any) => page.transactions) ?? [];
+
+    // Note: Accurate global counts are hard with infinite scroll.
+    // We'll calculate counts based on what's currently loaded.
+    const counts = { all: allTx.length, received: 0, sent: 0, debt: 0 };
+    const filtered: typeof allTx = [];
+
+    for (const t of allTx) {
+      if (t.isIncome && !t.debt) counts.received++;
+      if (!t.isIncome && !t.debt) counts.sent++;
+      if (t.debt) counts.debt++;
+
+      if (activeFilter === "all") filtered.push(t);
+      else if (activeFilter === "received" && t.isIncome && !t.debt) filtered.push(t);
+      else if (activeFilter === "sent" && !t.isIncome && !t.debt) filtered.push(t);
+      else if (activeFilter === "debt" && t.debt) filtered.push(t);
     }
 
-    const t = setTimeout(() => setShowLoader(true), 150);
-    return () => clearTimeout(t);
-  }, [loading]);
+    return { filteredTransactions: filtered, counts };
+  }, [data, activeFilter]);
 
-  const filteredTransactions = useMemo(() => {
-    switch (activeFilter) {
-      case "received":
-        return transactions.filter((t) => t.isIncome);
+  if (isError) {
+    return (
+      <ThemedGradientBackground className="flex-1 justify-center items-center">
+        <ScreenLoader label="Error loading transactions. Please try again." />
+      </ThemedGradientBackground>
+    );
+  }
 
-      case "sent":
-        return transactions.filter((t) => !t.isIncome && !t.debt);
-
-      case "debt":
-        return transactions.filter((t) => !!t.debt);
-
-      default:
-        return transactions;
-    }
-  }, [activeFilter, transactions]);
-
-  const counts = useMemo(
-    () => ({
-      all: transactions.length,
-      received: transactions.filter((t) => t.isIncome && !t.debt).length,
-      sent: transactions.filter((t) => !t.isIncome && !t.debt).length,
-      debt: transactions.filter((t) => t.debt).length,
-    }),
-    [transactions],
-  );
+  const isLoading = isLoadingMonths || (isLoadingTx && (!data?.pages || data.pages[0]?.transactions?.length === 0));
 
   return (
     <ThemedGradientBackground className="flex-1 pt-5">
@@ -58,11 +61,14 @@ export default function TransactionsScreen() {
         />
       </View>
 
-      {loading && showLoader ? (
-        <ScreenLoader label="Loading transactions…" />
-      ) : (
-        <TransactionList transactions={filteredTransactions} />
-      )}
+      <TransactionList
+        transactions={filteredTransactions}
+        availableMonths={monthsData}
+        isInitialLoading={isLoading}
+        isLoadingNextPage={isFetchingNextPage}
+        hasNextPage={hasNextPage}
+        onLoadMore={fetchNextPage}
+      />
     </ThemedGradientBackground>
   );
 }

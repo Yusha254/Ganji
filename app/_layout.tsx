@@ -11,12 +11,15 @@ import {
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef, useState } from "react";
 import "../global.css";
+
+const queryClient = new QueryClient();
 
 export {
   ErrorBoundary
@@ -56,9 +59,11 @@ export default function RootLayout() {
   }
 
   return (
-    <SettingsProvider>
-      <RootLayoutNav />
-    </SettingsProvider>
+    <QueryClientProvider client={queryClient}>
+      <SettingsProvider>
+        <RootLayoutNav />
+      </SettingsProvider>
+    </QueryClientProvider>
   );
 }
 
@@ -70,7 +75,6 @@ function RootLayoutNav() {
   useEffect(() => {
     if (!isLoading && autoScan && !hasScanned.current) {
       hasScanned.current = true;
-      console.log("🔄 Auto-scanning SMS...");
       const minDate = lastSmsSync > 0 ? lastSmsSync : Date.now();
 
       scanMpesaMessages("all", minDate)
@@ -78,6 +82,8 @@ function RootLayoutNav() {
           if (msgs.length > 0) {
             console.log(`📥 Ingesting ${msgs.length} new messages...`);
             await ingestSmsMessages(msgs);
+            // Invalidate queries after ingestion to refresh data
+            queryClient.invalidateQueries({ queryKey: ['transactions'] });
           } else {
             console.log("✅ No new messages found.");
           }

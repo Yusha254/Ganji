@@ -1,3 +1,4 @@
+import { AvailableMonth } from "@/data";
 import { buildRangeAnalytics } from "@/utils/analytics/buildRangeAnalytics";
 
 /*------------------- GLOBAL INTERFACES ------------------*/
@@ -122,6 +123,15 @@ export type AutoSmsProps = {
   onToggle: () => void;
 };
 
+export interface TransactionListProps {
+  transactions: TransactionWithDebt[];
+  availableMonths?: AvailableMonth[];
+  isLoadingNextPage?: boolean;
+  hasNextPage?: boolean;
+  onLoadMore?: () => void;
+  isInitialLoading?: boolean;
+}
+
 export interface PinEntryScreenProps {
   storedPin: string;
   onSuccess: () => void;
@@ -151,11 +161,6 @@ export type ManualSmsProps = {
   isScanning: boolean;
   scanComplete: boolean;
   onScan: (value: string) => void;
-};
-
-export type TransactionListProps = {
-  transactions: TransactionWithDebt[];
-  loading?: boolean;
 };
 
 /*------------------- HOME COMPONENT PROPS ------------------*/
