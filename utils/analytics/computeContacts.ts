@@ -1,6 +1,6 @@
-import { ContactStats, Transaction } from "@/interfaces";
+import { ContactStats, TransactionWithDebt } from "@/interfaces";
 
-export function computeContacts(transactions: Transaction[]) {
+export function computeContacts(transactions: TransactionWithDebt[]) {
   // Map to aggregate stats per contact
   const contactMap: Record<
     string,
@@ -9,10 +9,18 @@ export function computeContacts(transactions: Transaction[]) {
       totalAmount: number;
       totalSent: number;
       totalReceived: number;
+      totalFees: number;
     }
   > = {};
 
   transactions.forEach((tx) => {
+    const isExcluded =
+      tx.isBalanceCheck ||
+      tx.isDebtRepayment ||
+      tx.name === "Debt Repayment" ||
+      tx.name === "Balance Check";
+
+    if (isExcluded) return;
     const key = tx.name ?? "Unknown";
     if (!contactMap[key]) {
       contactMap[key] = {
@@ -20,6 +28,7 @@ export function computeContacts(transactions: Transaction[]) {
         totalAmount: 0,
         totalSent: 0,
         totalReceived: 0,
+        totalFees: 0,
       };
     }
 
@@ -29,9 +38,12 @@ export function computeContacts(transactions: Transaction[]) {
 
     if (tx.isIncome) {
       contactMap[key].totalReceived += tx.amount;
-    } else if (!tx.isTransfer) {
+    } else {
       contactMap[key].totalSent += tx.amount;
     }
+
+    // Capture M-PESA fee + any debt interest incurred on this transaction
+    contactMap[key].totalFees += (tx.transactionCost || 0) + (tx.debt?.interest || 0);
   });
 
   // Convert map to ContactStats array
@@ -43,6 +55,7 @@ export function computeContacts(transactions: Transaction[]) {
       avgAmount: stats.totalAmount / stats.count,
       totalSent: stats.totalSent,
       totalReceived: stats.totalReceived,
+      avgFee: stats.totalFees / stats.count,
       rank: 0, // will assign rank later
     }),
   );

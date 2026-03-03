@@ -84,6 +84,8 @@ function RootLayoutNav() {
             await ingestSmsMessages(msgs);
             // Invalidate queries after ingestion to refresh data
             queryClient.invalidateQueries({ queryKey: ['transactions'] });
+            queryClient.invalidateQueries({ queryKey: ['availableMonths'] });
+            queryClient.invalidateQueries({ queryKey: ['transactionCounts'] });
           } else {
             console.log("✅ No new messages found.");
           }

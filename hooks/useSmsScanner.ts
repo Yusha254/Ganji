@@ -1,12 +1,14 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
 import { IngestResult, SmsScanRange } from "../interfaces";
 import { ingestSmsMessages } from "../services/smsIngestService";
 import { scanMpesaMessages } from "../utils/SmsUtils";
 
-export function useSmsScanner(defaultRange: SmsScanRange =  "two_weeks", auto = false) {
+export function useSmsScanner(defaultRange: SmsScanRange = "two_weeks", auto = false) {
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState<IngestResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   const scanAndSave = useCallback(async (range: SmsScanRange) => {
     try {
@@ -18,6 +20,11 @@ export function useSmsScanner(defaultRange: SmsScanRange =  "two_weeks", auto = 
       const result = await ingestSmsMessages(messages);
 
       setStats(result);
+
+      // Invalidate queries to refresh UI
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["availableMonths"] });
+      queryClient.invalidateQueries({ queryKey: ["transactionCounts"] });
     } catch (err) {
       console.error(err);
       setError("Scan failed");
@@ -30,7 +37,7 @@ export function useSmsScanner(defaultRange: SmsScanRange =  "two_weeks", auto = 
     if (auto) {
       scanAndSave(defaultRange);
     }
-  }, [auto, defaultRange ,scanAndSave]);
+  }, [auto, defaultRange, scanAndSave]);
 
   return {
     scanAndSave,

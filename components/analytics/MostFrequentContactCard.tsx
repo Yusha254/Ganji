@@ -18,7 +18,7 @@ export default function MostFrequentContactsCard({
 
       {/* List of Contacts */}
       {contacts.map((contact) => {
-        const avgFee = contact.count > 0 ? contact.totalAmount / contact.count : 0;
+        const avgFee = contact.avgFee ?? 0;
         const totalSent = contact.totalSent ?? 0;
         const totalReceived = contact.totalReceived ?? 0;
         const netAmount = totalReceived - totalSent;

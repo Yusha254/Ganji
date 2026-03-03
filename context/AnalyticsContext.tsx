@@ -1,12 +1,11 @@
-//where exactly should i use totalDebtCost here
-
 import { useSettings } from "@/context/SettingsContext";
 import { useTransactions } from "@/context/TransactionContext";
+import { getCurrentFinancialStatus } from "@/data";
 import { AnalyticsContextValue, AnalyticsRange } from "@/interfaces";
 import { buildRangeAnalytics } from "@/utils/analytics/buildRangeAnalytics";
 import { computeDebtCosts } from "@/utils/analytics/computeDebtCosts";
 import { computeMonthlyStats } from "@/utils/analytics/computeMonthlyStats";
-import React, { createContext, useContext, useMemo } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const AnalyticsContext = createContext<AnalyticsContextValue | undefined>(
   undefined,
@@ -18,6 +17,14 @@ export const AnalyticsProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const { transactions } = useTransactions();
   const { dashboardType } = useSettings();
+
+  const [financialStatus, setFinancialStatus] = useState({ balance: 0, outstanding: 0 });
+
+  useEffect(() => {
+    getCurrentFinancialStatus()
+      .then(setFinancialStatus)
+      .catch(e => console.error("Failed to fetch financial status:", e));
+  }, [transactions]);
 
   const safeTransactions = transactions ?? [];
 
@@ -63,24 +70,8 @@ export const AnalyticsProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   const headBalance = useMemo(() => {
-    if (safeTransactions.length === 0) return 0;
-
-    // Transactions are already sorted date DESC, time DESC in context
-    for (const tx of safeTransactions) {
-      if (tx.balance !== undefined && tx.balance !== null) {
-        // user requirement: if balance is 0 and in debt, show -outstanding
-        if (tx.balance === 0 && tx.debt && tx.debt.outstanding > 0) {
-          return -tx.debt.outstanding;
-        }
-        return tx.balance;
-      }
-      // If message itself is a debt record (like Fuliza Debt) but balance field missing
-      if (tx.debt && tx.debt.outstanding > 0) {
-        return -tx.debt.outstanding;
-      }
-    }
-    return 0;
-  }, [safeTransactions]);
+    return financialStatus.balance - financialStatus.outstanding;
+  }, [financialStatus]);
 
   return (
     <AnalyticsContext.Provider

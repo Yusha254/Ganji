@@ -29,6 +29,7 @@ export function parseFulizaRepayment(message: string, smsDate?: number): Transac
     isWithdrawal: false,
     isDeposit: false,
     isTransfer: true,
-    name: "Debt Repayment"
+    name: "Debt Repayment",
+    isDebtRepayment: true,
   };
 }

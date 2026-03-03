@@ -2,7 +2,18 @@ import { Transaction } from "@/interfaces";
 import { convertToISO } from "../../DateUtils";
 import { formatName } from "../../StringUtils";
 import { parseNumber } from "../helpers";
-import { amountRegex, balanceRegex, costRegex, dateTimeRegex, isIncomeRegex, nameMatchRegexExpense, nameMatchRegexIncome, transactionCodeRegex } from "../regex";
+import {
+  airtimeRegex,
+  amountRegex,
+  balanceCheckRegex,
+  balanceRegex,
+  costRegex,
+  dateTimeRegex,
+  isIncomeRegex,
+  nameMatchRegexExpense,
+  nameMatchRegexIncome,
+  transactionCodeRegex
+} from "../regex";
 
 export function parseTransaction(message: string): Transaction | null {
   const code = message.match(transactionCodeRegex)?.[1];
@@ -28,9 +39,22 @@ export function parseTransaction(message: string): Transaction | null {
   const balanceMatch = message.match(balanceRegex);
   const balance = balanceMatch ? parseNumber(balanceMatch[1]) : undefined;
 
+  const isAirtime = airtimeRegex.test(message);
+  const isBalanceCheck = balanceCheckRegex.test(message);
+
+  let finalName = name;
+  if (isAirtime) finalName = "Safaricom Airtime";
+  if (isBalanceCheck) finalName = "Balance Check";
+
+  let finalAmount = amount;
+  // Hustler Fund handling: receipts (income) are credited at 95%
+  if (isIncome && finalName?.toLowerCase().includes("hustler fund")) {
+    finalAmount = amount * 0.95;
+  }
+
   return {
     code: code,
-    amount: amount,
+    amount: finalAmount,
     transactionCost: transactionCost,
     balance: balance,
     date: date,
@@ -42,6 +66,7 @@ export function parseTransaction(message: string): Transaction | null {
     isWithdrawal: false,
     isDeposit: false,
 
-    name: name,
+    name: finalName,
+    isBalanceCheck: isBalanceCheck,
   };
 }

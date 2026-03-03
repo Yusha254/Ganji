@@ -1,7 +1,7 @@
 import { ScrollView, Text, ThemedCard, View } from "@/components/Themed";
 import TransactionCard from "@/components/transactions/TransactionCard";
-import { AvailableMonth, getTransactionsPaginated } from "@/data";
-import { TransactionListProps, TransactionWithDebt } from "@/interfaces";
+import { getTransactionsPaginated } from "@/data";
+import { AvailableMonth, TransactionListProps, TransactionWithDebt } from "@/interfaces";
 import { toISODateTime } from "@/utils/DateUtils";
 import Feather from "@expo/vector-icons/Feather";
 import { FlashList } from "@shopify/flash-list";
@@ -115,12 +115,6 @@ export default function TransactionList({
         const isOpen = expandedMonths.has(monthKey);
         const isLoadingManual = manualLoadingMonths.has(monthKey);
 
-        // Approximate total for the month (only from what's loaded)
-        const monthTotal = monthTx.reduce((sum, t) => {
-          if (t.isTransfer) return sum;
-          return sum + (t.isIncome ? t.amount : -t.amount);
-        }, 0);
-
         return (
           <ThemedCard className="mb-4 px-0 py-0 overflow-hidden">
             <Pressable
@@ -137,10 +131,10 @@ export default function TransactionList({
               <View className="flex-row items-center gap-3">
                 <Text
                   className={`font-semibold`}
-                  lightColor={monthTotal >= 0 ? "rgb(74,222,128)" : "rgb(248,113,113)"}
-                  darkColor={monthTotal >= 0 ? "rgb(74,222,128)" : "rgb(248,113,113)"}
+                  lightColor={month.net >= 0 ? "rgb(74,222,128)" : "rgb(248,113,113)"}
+                  darkColor={month.net >= 0 ? "rgb(74,222,128)" : "rgb(248,113,113)"}
                 >
-                  {monthTotal !== 0 ? `${monthTotal >= 0 ? "+" : "-"}KSh${Math.abs(monthTotal).toFixed(2)}` : ""}
+                  {month.net !== 0 ? `${month.net >= 0 ? "+" : "-"}KSh${Math.abs(month.net).toFixed(2)}` : ""}
                 </Text>
 
                 <Feather

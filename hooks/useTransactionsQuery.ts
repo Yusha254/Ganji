@@ -1,5 +1,5 @@
-import { getAvailableMonths, getTransactionsPaginated } from "@/data";
-import { TransactionWithDebt } from "@/interfaces";
+import { getAvailableMonths, getTransactionCounts, getTransactionsPaginated } from "@/data";
+import { InfiniteTransactionsPage } from "@/interfaces";
 import { InfiniteData, useInfiniteQuery, useQuery } from "@tanstack/react-query";
 
 const PAGE_SIZE = 30;
@@ -11,11 +11,14 @@ export function useAvailableMonths() {
     });
 }
 
-export interface InfiniteTransactionsPage {
-    transactions: TransactionWithDebt[];
-    monthKey: string;
-    offset: number;
+export function useTransactionCounts() {
+    return useQuery({
+        queryKey: ["transactionCounts"],
+        queryFn: getTransactionCounts,
+    });
 }
+
+
 
 export type InfiniteTransactionsParam = { monthKey: string; offset: number };
 

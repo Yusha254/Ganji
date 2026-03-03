@@ -1,4 +1,3 @@
-import { AvailableMonth } from "@/data";
 import { buildRangeAnalytics } from "@/utils/analytics/buildRangeAnalytics";
 
 /*------------------- GLOBAL INTERFACES ------------------*/
@@ -19,6 +18,8 @@ export interface Transaction {
   isTransfer?: boolean;
 
   name?: string;
+  isDebtRepayment?: boolean;
+  isBalanceCheck?: boolean;
 }
 
 export interface Debt {
@@ -30,6 +31,22 @@ export interface Debt {
   dueDate: string;
 }
 
+export interface AvailableMonth {
+  monthKey: string; // YYYY-MM
+  label: string;    // August 2025
+  count: number;
+  income: number;
+  expense: number;
+  net: number;
+}
+
+export interface TransactionCounts {
+  all: number;
+  received: number;
+  sent: number;
+  debt: number;
+}
+
 /*------------------- UTIL/SERVICES TYPES ------------------*/
 export type MpesaMessageType =
   | "TRANSACTION"
@@ -38,6 +55,8 @@ export type MpesaMessageType =
   | "FULIZA_DEBT"
   | "FULIZA_REPAYMENT"
   | "DEPOSIT"
+  | "AIRTIME"
+  | "BALANCE_CHECK"
   | "UNKNOWN";
 
 export type SmsScanRange = "two_weeks" | "month" | "three_months" | "all";
@@ -51,6 +70,12 @@ export type IngestResult = {
 export interface RawSms {
   body: string;
   date: number;
+}
+
+export interface InfiniteTransactionsPage {
+  transactions: TransactionWithDebt[];
+  monthKey: string;
+  offset: number;
 }
 
 /*------------------- CONTEXT TYPES ------------------*/
@@ -76,6 +101,7 @@ export interface ContactStats {
   count: number;
   totalAmount: number;
   avgAmount: number;
+  avgFee: number;
   totalSent?: number;
   totalReceived?: number;
   rank: number;

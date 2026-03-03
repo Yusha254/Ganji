@@ -16,8 +16,16 @@ export async function ingestSmsMessages(
 
     if (!parsed) {
       skipped++;
-      console.log("Failed to parse SMS:", sms.body);
+      console.log("❌ Failed to parse SMS structure:", sms.body);
       continue;
+    }
+
+    // Diagnostic: Check for "Unknown" or "N/A" names in transactions
+    if ("name" in parsed) {
+      const name = (parsed as any).name;
+      if (!name || name === "N/A" || name === "Unknown") {
+        console.log("⚠️ UNKNOWN NAME DETECTED. Raw SMS:", sms.body);
+      }
     }
 
     try {

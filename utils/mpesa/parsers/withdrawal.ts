@@ -38,6 +38,6 @@ export function parseWithdrawal(message: string): Transaction | null {
     isDeposit: false,
 
     balance: balance,
-    name: nameMatch ? formatName(nameMatch[1]) : undefined,
+    name: nameMatch ? formatName(nameMatch[1].replace(/account$/i, '').trim()) : undefined,
   };
 }

@@ -7,8 +7,19 @@ export function computeTotals(transactions: TransactionWithDebt[]) {
   let totalTransactionCost = 0;
 
   transactions.forEach((tx) => {
-    if (tx.isIncome) totalReceived += tx.amount;
-    else totalSent += tx.amount;
+    if (tx.isBalanceCheck || tx.name === "Balance Check") return;
+
+    if (tx.isIncome) {
+      totalReceived += tx.amount;
+    } else {
+      // For debt repayment, the "amount" is principal payback (not an expense)
+      // Only the transactionCost (interest/fee) is the real expense here.
+      if (tx.isDebtRepayment || tx.name === "Debt Repayment") {
+        // Principal is already excluded from totalSent by return/if logic
+      } else {
+        totalSent += tx.amount;
+      }
+    }
 
     totalTransactionCost += tx.transactionCost ?? 0;
   });

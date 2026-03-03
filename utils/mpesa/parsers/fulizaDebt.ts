@@ -20,7 +20,7 @@ export function parseFulizaDebt(message: string, smsDate?: number): (Transaction
     code,
     amount: debtAmount,
     transactionCost: interest,
-    balance: 0,
+    balance: undefined,
     date,
     time,
     isIncome: false,
